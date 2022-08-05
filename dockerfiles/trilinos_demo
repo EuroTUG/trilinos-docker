@@ -1,0 +1,59 @@
+########
+# base #
+########
+FROM centos:latest AS base
+
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
+RUN yum -y update
+RUN yum -y install less wget emacs make cmake m4 git gcc gcc-gfortran gcc-c++ blas lapack mpich mpich-devel boost boost-devel
+
+ENV PATH=/usr/lib64/mpich/bin/:$PATH
+
+###############
+# suitesparse #
+###############
+FROM base AS suitesparse
+
+# Suitesparse
+WORKDIR /opt/suitesparse/
+RUN wget -nv https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v5.4.0.tar.gz
+RUN tar xfz /opt/suitesparse/v5.4.0.tar.gz
+RUN mv /opt/suitesparse/SuiteSparse-5.4.0/ /opt/suitesparse/source
+RUN rm /opt/suitesparse/v5.4.0.tar.gz
+WORKDIR /opt/suitesparse/source
+RUN make BLAS=/usr/lib64/libblas.so.3 LAPACK=/usr/lib64/liblapack.so.3 && make install BLAS=/usr/lib64/libblas.so.3 LAPACK=/usr/lib64/liblapack.so.3 INSTALL=/opt/suitesparse/install
+
+############
+# trilinos #
+############
+FROM suitesparse AS trilinos
+
+ARG TRILINOS_CONFIGFILE=do-configure-trilinos.sh
+ARG TRILINOS_VERSION=13-2-0
+
+WORKDIR /opt/trilinos/
+RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-release-$TRILINOS_VERSION.tar.gz
+
+# extract trilinos source file
+RUN mkdir /opt/trilinos/build
+RUN mkdir /opt/trilinos/install
+RUN tar xfz /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz
+RUN mv /opt/trilinos/Trilinos-trilinos-release-13-2-0 /opt/trilinos/source
+RUN rm -f /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz
+
+# copy configure script to build directory
+COPY $TRILINOS_CONFIGFILE /opt/trilinos/build/do-configure-trilinos.sh
+
+WORKDIR /opt/trilinos/build
+RUN ./do-configure-trilinos.sh
+RUN make -j4 && make install
+
+#################
+# trilinos_demo #
+#################
+FROM trilinos AS trilinos_demo
+
+# Trilinos demo
+WORKDIR /opt/trilinos_demo
