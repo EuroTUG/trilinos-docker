@@ -31,7 +31,7 @@ RUN make BLAS=/usr/lib64/libblas.so.3 LAPACK=/usr/lib64/liblapack.so.3 && make i
 FROM suitesparse AS trilinos
 
 ARG TRILINOS_CONFIGFILE=do-configure-trilinos.sh
-ARG TRILINOS_VERSION=13-2-0
+ARG TRILINOS_VERSION=13-4-0
 
 WORKDIR /opt/trilinos/
 RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-release-$TRILINOS_VERSION.tar.gz
@@ -40,7 +40,7 @@ RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-rel
 RUN mkdir /opt/trilinos/build
 RUN mkdir /opt/trilinos/install
 RUN tar xfz /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz
-RUN mv /opt/trilinos/Trilinos-trilinos-release-13-2-0 /opt/trilinos/source
+RUN mv /opt/trilinos/Trilinos-trilinos-release-$TRILINOS_VERSION /opt/trilinos/source
 RUN rm -f /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz
 
 # copy configure script to build directory
