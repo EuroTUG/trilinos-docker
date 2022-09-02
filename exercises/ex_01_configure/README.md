@@ -28,13 +28,13 @@ The Trilinos source code repository is located at `/opt/.../`. Required dependen
 1. Create the build directory via
 
    ```bash
-   mkdir trilnos_build
+   mkdir trilinos_build
    ```
 
 1. Create the install directory via
 
    ```bash
-   mkdir trilnos_install
+   mkdir trilinos_install
    ```
 
 ## Configure Trilinos
