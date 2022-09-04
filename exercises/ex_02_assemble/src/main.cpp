@@ -13,7 +13,6 @@
 #include <Tpetra_Version.hpp>
 
 int main(int argc, char *argv[]) {
-    using namespace std;
     using namespace Teuchos;
     using Teuchos::tuple;
     typedef Tpetra::MultiVector<> multivec_type;
@@ -42,17 +41,17 @@ int main(int argc, char *argv[]) {
         const size_t numProcs = comm->getSize();
 
         // Print the Trilinos version and the number of MPI ranks of the test
-        RCP<Teuchos::FancyOStream> out = Teuchos::fancyOStream(Teuchos::rcpFromRef(cout));
+        RCP<Teuchos::FancyOStream> out = Teuchos::fancyOStream(Teuchos::rcpFromRef(std::cout));
         // Only print on rank 0
         const bool verbose = (myRank == 0);
-        if (verbose) *out << Tpetra::version() << endl;
-        if (verbose) *out << "Number of ranks: " << numProcs << endl;
+        if (verbose) *out << Tpetra::version() << std::endl;
+        if (verbose) *out << "Number of ranks: " << numProcs << std::endl;
 
         ////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////
-        if (verbose) *out << endl;
+        if (verbose) *out << std::endl;
         if (verbose) *out << ">> I. Create and print Tpetra map\n";
-        if (verbose) *out << endl;
+        if (verbose) *out << std::endl;
 
         // Construct a Map that puts approximately the same number of equations
         // on each processor; we start with index 0 (as standard in C++)
@@ -67,9 +66,9 @@ int main(int argc, char *argv[]) {
 
         ////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////
-        if (verbose) *out << endl;
+        if (verbose) *out << std::endl;
         if (verbose) *out << ">> II. Create, fill, and print sparse matrix (Tpetra CrsMatrix)\n";
-        if (verbose) *out << endl;
+        if (verbose) *out << std::endl;
 
         // Create a Tpetra sparse matrix whose rows have distribution given by
         // the Map. We expect at most three entries per row.
@@ -116,9 +115,9 @@ int main(int argc, char *argv[]) {
 
         ////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////
-        if (verbose) *out << endl;
+        if (verbose) *out << std::endl;
         if (verbose) *out << ">> III. Create right hand side and solution vectors and print the right hand side vector (Tpetra Vector)\n";
-        if (verbose) *out << endl;
+        if (verbose) *out << std::endl;
 
         RCP<vec_type> b(new vec_type(A->getRangeMap())); b->putScalar(ScalarTraits<scalar_type>::one());
         RCP<vec_type> x(new vec_type(A->getDomainMap())); x->putScalar(ScalarTraits<scalar_type>::zero());
@@ -127,9 +126,9 @@ int main(int argc, char *argv[]) {
 
         ////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////
-        if (verbose) *out << endl;
+        if (verbose) *out << std::endl;
         if (verbose) *out << ">> IV. Solve the system and print the right hand side (Tpetra Vector)\n";
-        if (verbose) *out << endl;
+        if (verbose) *out << std::endl;
 
         auto solver = Amesos2::create<crs_matrix_type,multivec_type>("Klu",A,x,b);
         solver->symbolicFactorization();
