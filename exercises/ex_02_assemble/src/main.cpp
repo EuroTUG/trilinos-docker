@@ -1,4 +1,9 @@
-// #include <iostream>
+
+#include <Amesos2.hpp>
+
+#include <Teuchos_Array.hpp>
+#include <Teuchos_RCP.hpp>
+#include <Teuchos_ScalarTraits.hpp>
 
 #include <Tpetra_Core.hpp>
 #include <Tpetra_CrsMatrix.hpp>
@@ -6,11 +11,6 @@
 #include <Tpetra_MultiVector.hpp>
 #include <Tpetra_Vector.hpp>
 #include <Tpetra_Version.hpp>
-#include <Teuchos_Array.hpp>
-#include <Teuchos_ScalarTraits.hpp>
-#include <Teuchos_RCP.hpp>
-
-#include <Amesos2.hpp>
 
 int main(int argc, char *argv[]) {
     using namespace std;
