@@ -13,8 +13,10 @@
 #include <Tpetra_Version.hpp>
 
 int main(int argc, char *argv[]) {
-    using namespace Teuchos;
+    using Teuchos::RCP;
+    using Teuchos::rcp;
     using Teuchos::tuple;
+
     typedef Tpetra::MultiVector<> multivec_type;
     typedef multivec_type::scalar_type scalar_type;
     typedef multivec_type::local_ordinal_type local_ordinal_type;
@@ -27,7 +29,7 @@ int main(int argc, char *argv[]) {
     typedef typename crs_matrix_type::nonconst_values_host_view_type vals_type;
 
     // Read input parameters from command line
-    CommandLineProcessor clp;
+    Teuchos::CommandLineProcessor clp;
     Tpetra::global_size_t numGblIndices = 50; clp.setOption("n",&numGblIndices,"number of nodes / number of global indices (default: 50)");
 
     // Never create Tpetra objects at main() scope.
@@ -59,7 +61,7 @@ int main(int argc, char *argv[]) {
         RCP<const map_type> map = rcp(new map_type(numGblIndices, indexBase, comm));
 
         // Print all information about the map (maximum verbosity: VERB_EXTREME)
-        map->describe(*out,VERB_EXTREME);
+        map->describe(*out, Teuchos::VERB_EXTREME);
 
         // Get the number of elements owned by the local MPI rank
         const size_t numMyElements = map->getLocalNumElements ();
@@ -111,7 +113,7 @@ int main(int argc, char *argv[]) {
 
         // Print all information about the matrix (maximum verbosity:
         // VERB_EXTREME)
-        A->describe(*out,VERB_EXTREME);
+        A->describe(*out, Teuchos::VERB_EXTREME);
 
         ////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////
@@ -119,10 +121,10 @@ int main(int argc, char *argv[]) {
         if (verbose) *out << ">> III. Create right hand side and solution vectors and print the right hand side vector (Tpetra Vector)\n";
         if (verbose) *out << std::endl;
 
-        RCP<vec_type> b(new vec_type(A->getRangeMap())); b->putScalar(ScalarTraits<scalar_type>::one());
-        RCP<vec_type> x(new vec_type(A->getDomainMap())); x->putScalar(ScalarTraits<scalar_type>::zero());
+        RCP<vec_type> b(new vec_type(A->getRangeMap())); b->putScalar(Teuchos::ScalarTraits<scalar_type>::one());
+        RCP<vec_type> x(new vec_type(A->getDomainMap())); x->putScalar(Teuchos::ScalarTraits<scalar_type>::zero());
 
-        b->describe(*out,VERB_EXTREME);
+        b->describe(*out, Teuchos::VERB_EXTREME);
 
         ////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////
@@ -135,7 +137,7 @@ int main(int argc, char *argv[]) {
         solver->numericFactorization();
         solver->solve();
 
-        x->describe(*out,VERB_EXTREME);
+        x->describe(*out, Teuchos::VERB_EXTREME);
 
         return 0;
     }
