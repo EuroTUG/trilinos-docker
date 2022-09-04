@@ -13,7 +13,7 @@ project(ex_02_assemble NONE)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Get Trilinos as one entity but require the packages being used
-find_package(Trilinos REQUIRED COMPONENTS Teuchos Tpetra)
+find_package(Trilinos REQUIRED COMPONENTS Amesos2 Teuchos Tpetra)
 
 # Echo trilinos build info just for fun
 MESSAGE("\nFound Trilinos!  Here are the details: ")
