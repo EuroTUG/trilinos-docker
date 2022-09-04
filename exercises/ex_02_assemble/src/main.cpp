@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 
     // Read input parameters from command line
     Teuchos::CommandLineProcessor clp;
-    Tpetra::global_size_t numGblIndices = 50; clp.setOption("n",&numGblIndices,"number of nodes / number of global indices (default: 50)");
+    Tpetra::global_size_t numGblIndices = 50; clp.setOption("n", &numGblIndices, "number of nodes / number of global indices (default: 50)");
 
     // Never create Tpetra objects at main() scope.
     // Never allow them to persist past ScopeGuard's destructor.
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
         map->describe(*out, Teuchos::VERB_EXTREME);
 
         // Get the number of elements owned by the local MPI rank
-        const size_t numMyElements = map->getLocalNumElements ();
+        const size_t numMyElements = map->getLocalNumElements();
 
         ////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////
@@ -74,39 +74,41 @@ int main(int argc, char *argv[]) {
 
         // Create a Tpetra sparse matrix whose rows have distribution given by
         // the Map. We expect at most three entries per row.
-        RCP<crs_matrix_type> A (new crs_matrix_type (map, 3));
+        RCP<crs_matrix_type> A(new crs_matrix_type (map, 3));
+
         // We did not specify a column map => We will assemble using global
         // indices and let Trilinos create the column map for us when calling
         // fillComplete()
 
         // Fill the sparse matrix, one row at a time.
-        const scalar_type two = static_cast<scalar_type> (2.0);
-        const scalar_type negOne = static_cast<scalar_type> (-1.0);
-        for (local_ordinal_type lclRow = 0; lclRow < static_cast<local_ordinal_type> (numMyElements); ++lclRow) {
+        const scalar_type two = static_cast<scalar_type>(2.0);
+        const scalar_type negOne = static_cast<scalar_type>(-1.0);
+        for (local_ordinal_type lclRow = 0; lclRow < static_cast<local_ordinal_type>(numMyElements); ++lclRow) {
             const global_ordinal_type gblRow = map->getGlobalElement (lclRow);
             // A(0, 0:1) = [2, -1]
             if (gblRow == 0) {
                 A->insertGlobalValues(gblRow,
-                                           tuple<global_ordinal_type>(gblRow, gblRow+1),
-                                           tuple<scalar_type>(two, negOne));
+                    tuple<global_ordinal_type>(gblRow, gblRow+1),
+                    tuple<scalar_type>(two, negOne));
             }
             // A(N-1, N-2:N-1) = [-1, 2]
-            else if (static_cast<Tpetra::global_size_t> (gblRow) == numGblIndices-1) {
+            else if (static_cast<Tpetra::global_size_t>(gblRow) == numGblIndices-1) {
                 A->insertGlobalValues(gblRow,
-                                           tuple<global_ordinal_type>(gblRow-1, gblRow),
-                                           tuple<scalar_type>(negOne, two));
+                    tuple<global_ordinal_type>(gblRow-1, gblRow),
+                    tuple<scalar_type>(negOne, two));
             }
             // A(i, i-1:i+1) = [-1, 2, -1]
             else {
                 A->insertGlobalValues(gblRow,
-                                           tuple<global_ordinal_type>(gblRow-1, gblRow, gblRow+1),
-                                           tuple<scalar_type>(negOne, two, negOne));
+                    tuple<global_ordinal_type>(gblRow-1, gblRow, gblRow+1),
+                    tuple<scalar_type>(negOne, two, negOne));
             }
         }
         // Tell the sparse matrix that we are done adding entries to it. For
         // completeness, we specify the domain and range maps (here, both are
         // the map created before).
-        A->fillComplete(map,map);
+        A->fillComplete(map, map);
+
         // If matrix->fillComplete(); would be called instead (no arguments), the
         // same would happen since Trilinos would automatically use the row map
         // as domain and range map
@@ -132,7 +134,7 @@ int main(int argc, char *argv[]) {
         if (verbose) *out << ">> IV. Solve the system and print the right hand side (Tpetra Vector)\n";
         if (verbose) *out << std::endl;
 
-        auto solver = Amesos2::create<crs_matrix_type,multivec_type>("Klu",A,x,b);
+        auto solver = Amesos2::create<crs_matrix_type,multivec_type>("Klu", A, x, b);
         solver->symbolicFactorization();
         solver->numericFactorization();
         solver->solve();
