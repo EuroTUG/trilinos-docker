@@ -33,7 +33,7 @@ This exercise comes with a small application and some source code in `/opt/trili
 1. Create the build directory via
 
    ```bash
-   mkdir trilinos_build
+   mkdir build
    ```
 
 ## Creating the CMake project (without Trilinos)
