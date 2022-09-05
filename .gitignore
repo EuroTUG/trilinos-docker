@@ -1,4 +1,5 @@
 # Ingore build and install directories for exercises
+exercises/ex_01_configure/do-configure-trilinos
 exercises/ex_01_configure/trilinos_build/
 exercises/ex_01_configure/trilinos_install/
 
