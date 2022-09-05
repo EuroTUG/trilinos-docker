@@ -23,7 +23,7 @@ Required dependencies (such as `CMake`, `SuiteSparse`, ...) are pre-installed in
 1. Navigate to base directory for this exercise
 
    ```bash
-   cd /opt/trilinos_demo/exercises/ex_01_configure
+   cd /opt/trilinos_demo/exercises/ex_01_configure/
    ```
 
 1. Create the build directory via
