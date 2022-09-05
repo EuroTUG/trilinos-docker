@@ -38,8 +38,9 @@ This exercise comes with a small application and some source code in `/opt/trili
 
 ## Creating the CMake project (without Trilinos)
 
-> In this part of the exercise, you will work with an existing `CMakeLists.txt` file, where you will fill in imporant parts yourself.
-The file is located at `/opt/trilinos_demo/exercises/ex_01_cmake/src/CMakeLists.txt`. Places, where modifications are required, are encapsulated by the lines
+In this part of the exercise, you will work with an existing `CMakeLists.txt` file, where you will fill in imporant parts yourself.
+The file is located at `/opt/trilinos_demo/exercises/ex_01_cmake/src/CMakeLists.txt`.
+Places, where modifications are required, are encapsulated by the lines
 
 ```cmake
 ### START OF TODO: <Short instruction> ###
@@ -70,8 +71,9 @@ where the `<Short instruction>` provides a summary of the steps to be done.
 
 ## Building the application code - Part I
 
-> In this part of the exercise, you will work with an existing `main.cpp` file, where you will fill in imporant parts yourself.
-The file is located at `/opt/trilinos_demo/exercises/ex_01_cmake/src/main.cpp`. Places, where modifications are required, are encapsulated by the lines
+In this part of the exercise, you will work with an existing `main.cpp` file, where you will fill in imporant parts yourself.
+The file is located at `/opt/trilinos_demo/exercises/ex_01_cmake/src/main.cpp`.
+Places, where modifications are required, are encapsulated by the lines
 
 ```cpp
 /* START OF TODO: <Short instruction> */
