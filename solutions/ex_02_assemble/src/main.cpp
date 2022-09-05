@@ -55,8 +55,8 @@ int main(int argc, char *argv[]) {
     // Construct a Map that puts approximately the same number of equations
     // on each processor; we start with index 0 (as standard in C++)
     /* START OF TODO: Create map */
-
-
+    const global_ordinal_type indexBase = 0;
+    RCP<const map_type> map = rcp(new map_type(numGblIndices, indexBase, comm));
     /* END OF TODO: Create map */
 
     // Print all information about the map (maximum verbosity: VERB_EXTREME)
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     // Create a Tpetra sparse matrix whose rows have distribution given by
     // the Map. We expect at most three entries per row.
     /* START OF TODO: Create empty matrix */
-
+    RCP<crs_matrix_type> A = rcp(new crs_matrix_type (map, 3));
     /* END OF TODO: Create empty matrix */
 
     // We did not specify a column map => We will assemble using global
@@ -85,26 +85,31 @@ int main(int argc, char *argv[]) {
     for (local_ordinal_type lclRow = 0; lclRow < static_cast<local_ordinal_type>(numMyElements); ++lclRow) {
       // Convert local index to global index
       /* START OF TODO: convert local to global index */
-
+      const global_ordinal_type gblRow = map->getGlobalElement(lclRow);
       /* END OF TODO: convert local to global index */
 
       // A(0, 0:1) = [2, -1]
       if (gblRow == 0) {
         /* START OF TODO: Fill first row */
-
+        A->insertGlobalValues(gblRow,
+          tuple<global_ordinal_type>(gblRow, gblRow + 1),
+          tuple<scalar_type>(two, negOne));
         /* END OF TODO: Fill first row */
       }
       // A(N-1, N-2:N-1) = [-1, 2]
       else if (static_cast<Tpetra::global_size_t>(gblRow) == numGblIndices - 1) {
         /* START OF TODO: Fill last row */
-
+        A->insertGlobalValues(gblRow,
+          tuple<global_ordinal_type>(gblRow - 1, gblRow),
+          tuple<scalar_type>(negOne, two));
         /* END OF TODO: Fill last row */
       }
       // A(i, i-1:i+1) = [-1, 2, -1]
       else {
         /* START OF TODO: Fill intermediate rows */
-
-
+        A->insertGlobalValues(gblRow,
+          tuple<global_ordinal_type>(gblRow - 1, gblRow, gblRow + 1),
+          tuple<scalar_type>(negOne, two, negOne));
         /* END OF TODO: Fill intermediate rows */
       }
     }
@@ -113,7 +118,7 @@ int main(int argc, char *argv[]) {
     // completeness, we specify the domain and range maps (here, both are
     // the map created before).
     /* START OF TODO: Fill complete */
-
+    A->fillComplete(map, map);
     /* END OF TODO: Fill complete */
 
     // If matrix->fillComplete(); would be called instead (no arguments), the
@@ -132,8 +137,8 @@ int main(int argc, char *argv[]) {
 
     // Right-hand side vector
     /* START OF TODO: Fill right-hand side */
-
-
+    RCP<vec_type> b(new vec_type(A->getRangeMap()));
+    b->putScalar(Teuchos::ScalarTraits<scalar_type>::one());
     /* END OF TODO: Fill right-hand side */
 
     b->describe(*out, Teuchos::VERB_EXTREME);
