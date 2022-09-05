@@ -53,10 +53,10 @@ endif()
 # so we make the enable of Fortran optional based on it's enable in Trilinos.
 
 # Build the APP and link to Trilinos
-add_executable(ex_02_solution ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
-target_include_directories(ex_02_solution PRIVATE
+add_executable(ex_02_assemble ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+target_include_directories(ex_02_assemble PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR} ${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
-target_link_libraries(ex_02_solution ${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES})
+target_link_libraries(ex_02_assemble ${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES})
 
 ## Set up a test
 #enable_testing()
