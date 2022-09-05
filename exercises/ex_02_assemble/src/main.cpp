@@ -19,17 +19,14 @@ int main(int argc, char *argv[]) {
   using Teuchos::rcp;
   using Teuchos::tuple;
 
-  typedef Tpetra::MultiVector<> multivec_type;
-  typedef multivec_type::scalar_type scalar_type;
-  typedef multivec_type::local_ordinal_type local_ordinal_type;
-  typedef multivec_type::global_ordinal_type global_ordinal_type;
-  typedef multivec_type::mag_type magnitude_type;
-  typedef Tpetra::Map<local_ordinal_type,global_ordinal_type> map_type;
-  typedef Tpetra::Vector<scalar_type,local_ordinal_type,global_ordinal_type> vec_type;
-  typedef Tpetra::CrsMatrix<scalar_type,local_ordinal_type,global_ordinal_type> crs_matrix_type;
+  using crs_matrix_type = Tpetra::CrsMatrix<>;
+  using map_type = Tpetra::Map<>;
+  using multivec_type = Tpetra::MultiVector<>;
+  using vec_type = Tpetra::Vector<>;
 
-  typedef typename crs_matrix_type::nonconst_global_inds_host_view_type gids_type;
-  typedef typename crs_matrix_type::nonconst_values_host_view_type vals_type;
+  using scalar_type = multivec_type::scalar_type;
+  using local_ordinal_type = multivec_type::local_ordinal_type;
+  using global_ordinal_type = multivec_type::global_ordinal_type;
 
   // Read input parameters from command line
   Teuchos::CommandLineProcessor clp;
