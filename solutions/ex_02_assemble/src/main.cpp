@@ -31,6 +31,12 @@ int main(int argc, char *argv[]) {
   // Read input parameters from command line
   Teuchos::CommandLineProcessor clp;
   Tpetra::global_size_t numGblIndices = 50; clp.setOption("n", &numGblIndices, "number of nodes / number of global indices (default: 50)");
+  switch (clp.parse(argc, argv)) {
+    case Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED:        return EXIT_SUCCESS;
+    case Teuchos::CommandLineProcessor::PARSE_ERROR:
+    case Teuchos::CommandLineProcessor::PARSE_UNRECOGNIZED_OPTION: return EXIT_FAILURE;
+    case Teuchos::CommandLineProcessor::PARSE_SUCCESSFUL:          break;
+  }
 
   // Never create Tpetra objects at main() scope.
   // Never allow them to persist past ScopeGuard's destructor.
