@@ -1,0 +1,40 @@
+#!/bin/bash
+
+BUILD_TYPE=RELEASE
+
+TRILINOS_SOURCE=/opt/trilinos/source
+TRILINOS_BUILD=/opt/trilinos_demo/exercises/ex_01_configure/trilinos_build
+TRILINOS_INSTALL=/opt/trilinos_demo/exercises/ex_01_configure/trilinos_install
+
+cmake \
+  -D CMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
+  -D CMAKE_INSTALL_PATH:STRING=${TRILINOS_INSTALL} \
+  -D CMAKE_CXX_FLAGS:STRING="" \
+  -D CMAKE_CXX_STANDARD:STRING=14 \
+  -D CMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
+  \
+  -D Trilinos_ASSERT_MISSING_PACKAGES:BOOL=ON \
+  -D Trilinos_ENABLE_ALL_PACKAGES:BOOL=OFF \
+  -D Trilinos_ENABLE_ALL_OPTIONAL_PACKAGES:BOOL=OFF \
+  -D Trilinos_ENABLE_EXPLICIT_INSTANTIATION:BOOL=ON \
+  -D Trilinos_ENABLE_Fortran:BOOL=OFF \
+  -D Trilinos_VERBOSE_CONFIGURE:BOOL=OFF \
+  \
+  -D Trilinos_ENABLE_Belos:BOOL=ON \
+  -D Trilinos_ENABLE_Galeri:BOOL=ON \
+  -D Trilinos_ENABLE_Ifpack2:BOOL=ON \
+    -D Trilinos_ENABLE_TESTS:BOOL=ON \
+  -D Trilinos_ENABLE_Kokkos:BOOL=ON \
+    -D Kokkos_ENABLE_SERIAL:BOOL=ON \
+  -D Trilinos_ENABLE_Tpetra:BOOL=ON \
+  \
+  -D TPL_ENABLE_MPI:BOOL=ON \
+  -D TPL_ENABLE_BLAS:BOOL=ON \
+    -D TPL_BLAS_LIBRARIES:FILEPATH=/usr/lib64/libblas.so.3 \
+  -D TPL_ENABLE_LAPACK:BOOL=ON \
+    -D TPL_LAPACK_LIBRARIES:FILEPATH=/usr/lib64/liblapack.so.3 \
+  -D TPL_ENABLE_UMFPACK:BOOL=ON \
+    -D UMFPACK_INCLUDE_DIRS:FILEPATH=/opt/suitesparse/install/include \
+    -D UMFPACK_LIBRARY_DIRS:FILEPATH=/opt/suitesparse/install/lib \
+  \
+  ${TRILINOS_SOURCE}
