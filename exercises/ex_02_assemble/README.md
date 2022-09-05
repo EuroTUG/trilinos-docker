@@ -1,5 +1,8 @@
 # How to assemble a linear system in Tpetra?
 
+In this exercise, you will assemble a linear system arising from the finite element discretization of a one-dimensional Poisson problem (wihtout boundary conditions for simplicity).
+The matrix will exhibit the well-know [-1, 2, -1] pattern in each row (except for the first and last row).
+
 ## Didactic goals
 
 This exercise will introduce you to basic concepts of the sparse linear algebra package `Tpetra`a `Tpetra::Map` and will show you how to assemble a linear system (matrix and right-hand side vector) using `Tpetra` objects.
