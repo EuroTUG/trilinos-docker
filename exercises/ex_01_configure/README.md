@@ -13,7 +13,8 @@ You will learn
 
 ## Starting point
 
-The Trilinos source code repository is located at `/opt/.../`. Required dependencies (such as `CMake`) are installed.
+The Trilinos source code repository is located at `/opt/trilinos/`.
+Required dependencies (such as `CMake`, `SuiteSparse`, ...) are pre-installed in the docker container.
 
 > Note: The Trilinos source code repository as well as all required dependencies are alerady part of the docker container for this Trilinos tutorial.
 
@@ -39,7 +40,10 @@ The Trilinos source code repository is located at `/opt/.../`. Required dependen
 
 ## Configure Trilinos
 
-> **Background information on the configure scirpt:** Trilinos will be configured by invoking the `cmake` command. The specific Trilinos configuration is managed via a set of options to be passed to the `cmake` command. For easier handling, documentation and reproducibility, we will write the `cmake` command within a configure script. To start the configuration process, we will then just execute this script.
+> **Background information on the configure scirpt:** Trilinos will be configured by invoking the `cmake` command.
+The specific Trilinos configuration is managed via a set of options to be passed to the `cmake` command.
+For easier handling, documentation and reproducibility, we will write the `cmake` command within a configure script.
+To start the configuration process, we will then just execute this script.
 
 1. In the base directory `/opt/trilinos_demo/exercises/ex_01_configure`, create a file `do-configure-trilinos` using your favorite text editor.
 
@@ -67,7 +71,8 @@ The Trilinos source code repository is located at `/opt/.../`. Required dependen
 
    > **Remarks:**
    >
-   > 1. We recommend to structure the list of options within the `cmake` comand into four blocks: build settings, general Trilinos settings, Trilinos packages configuration, Third Pary Libraries (TPLs).
+   > 1. We recommend to structure the list of options within the `cmake` comand into four blocks:
+   > build settings, general Trilinos settings, Trilinos packages configuration, Third Pary Libraries (TPLs).
    >
    > 1. We use the end-of-line symbol `\` to allow for line breaks within the `cmake` command in order to improve readibility.
 
