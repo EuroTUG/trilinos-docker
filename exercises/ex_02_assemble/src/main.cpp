@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     if (verbose) *out << ">> IV. Solve the system and print the right hand side (Tpetra Vector)\n";
     if (verbose) *out << std::endl;
 
-    auto solver = Amesos2::create<crs_matrix_type,multivec_type>("Klu", A, x, b);
+    auto solver = Amesos2::create<crs_matrix_type, multivec_type>("Klu", A, x, b);
     solver->symbolicFactorization();
     solver->numericFactorization();
     solver->solve();
