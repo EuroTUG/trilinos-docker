@@ -57,14 +57,3 @@ add_executable(ex_02_assemble ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 target_include_directories(ex_02_assemble PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR} ${Trilinos_INCLUDE_DIRS} ${Trilinos_TPL_INCLUDE_DIRS})
 target_link_libraries(ex_02_assemble ${Trilinos_LIBRARIES} ${Trilinos_TPL_LIBRARIES})
-
-## Set up a test
-#enable_testing()
-#configure_file(${CMAKE_CURRENT_SOURCE_DIR}/input.xml
-#  ${CMAKE_CURRENT_BINARY_DIR}/input.xml COPYONLY)
-#set(NUM_MPI_PROCS 4)
-#add_test(MyAppTest mpiexec -np ${NUM_MPI_PROCS} MyApp)
-#set_tests_properties(MyAppTest PROPERTIES
-#  PROCESSORS ${NUM_MPI_PROCS}
-#  PASS_REGULAR_EXPRESSION "vec.norm1[(][)] = 40"
-#  )
