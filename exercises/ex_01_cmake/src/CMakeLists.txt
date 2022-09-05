@@ -42,7 +42,7 @@ set(CMAKE_Fortran_FLAGS  "${Trilinos_Fortran_COMPILER_FLAGS} ${CMAKE_Fortran_FLA
 
 # End of setup and error checking.
 
-# Now enable the compilers now that we have gotten them from Trilinos
+# Now enable the compilers that we have gotten them Trilinos
 enable_language(C)
 enable_language(CXX)
 if (CMAKE_Fortran_COMPILER)
