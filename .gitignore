@@ -2,6 +2,8 @@
 exercises/ex_01_configure/trilinos_build/
 exercises/ex_01_configure/trilinos_install/
 
+exercises/ex_01_cmake/build/
+
 exercises/ex_02_assemble/build/
 exercises/ex_02_assemble/trilinos_build/
 exercises/ex_02_assemble/trilinos_install/
