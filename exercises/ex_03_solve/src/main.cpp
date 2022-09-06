@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
   std::string matrixType = "Laplace2D"; clp.setOption("matrixType", &matrixType, "Type of problem to be solved [Laplace1D, Laplace2D, Laplace3D, Elasticity2D, Elasticity3D] (default: Laplace2D)");
   scalar_type tol = 1.0e-4; clp.setOption("tol", &tol, "Tolerance to check for convergence of Krylov solver");
   int maxIters = -1; clp.setOption("maxIters", &maxIters, "Maximum number of iterations of the Krylov solver");
+  int outFrequency = 0; clp.setOption("outFrequency", &outFrequency, "Frequency of Belos iteration output.");
 
   switch (clp.parse(argc, argv)) {
     case Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED:        return EXIT_SUCCESS;
@@ -131,19 +132,12 @@ int main(int argc, char *argv[]) {
     belosList.set( "Num Blocks", 100);                    // Maximum number of blocks in Krylov subspace (max subspace size)
     belosList.set( "Flexible Gmres", false);              // Do not use FGMRES
 
+    // Configure verbosity of the Belos solver
     int verbLevel = Belos::Errors + Belos::Warnings;
-    // if (debug) {
-    //   verbLevel += Belos::Debug;
-    // }
-    // if (verbose) {
-    //   verbLevel += Belos::TimingDetails + Belos::FinalSummary + Belos::StatusTestDetails;
-    // }
-    // belosList.set( "Verbosity", verbLevel );
-    // if (verbose) {
-    //   if (frequency > 0) {
-    //     belosList.set( "Output Frequency", frequency );
-    //   }
-    // }
+    verbLevel += Belos::TimingDetails + Belos::FinalSummary + Belos::StatusTestDetails;
+    belosList.set( "Verbosity", verbLevel );
+    if (outFrequency > 0) belosList.set( "Output Frequency", outFrequency);
+
     // Construct an unpreconditioned linear problem instance.
     Belos::LinearProblem<scalar_type, multivec_type, operator_type> problem(matrix, x, rhs);
     problem.setInitResVec(rhs);
@@ -153,13 +147,16 @@ int main(int argc, char *argv[]) {
       return -1;
     }
 
+    // Create the actual solver object
     Belos::BlockCGSolMgr<scalar_type, multivec_type, operator_type> solver(Teuchos::rcpFromRef(problem), Teuchos::rcpFromRef(belosList));
 
+    // Print some statistics
     *out << "\nDimension of matrix: " << numGlobalElements
         << "\nMax number of Gmres iterations: " << maxIters
         << "\nRelative residual tolerance: " << tol
         << "\n" << std::endl;
 
+    // Perform the actual solve
     Belos::ReturnType ret = solver.solve();
     if (ret == Belos::Unconverged)
     {
