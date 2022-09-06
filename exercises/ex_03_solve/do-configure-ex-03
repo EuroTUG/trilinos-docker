@@ -1,0 +1,7 @@
+#!/bin/bash
+
+SOURCE_DIR=../src
+BUILD_DIR=`pwd`
+
+cmake \
+  ${SOURCE_DIR}
