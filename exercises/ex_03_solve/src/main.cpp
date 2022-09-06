@@ -5,13 +5,13 @@
 #include "utils.hpp"
 
 #include <BelosBlockCGSolMgr.hpp>
-#include <BelosBlockGmresSolMgr.hpp>
+// #include <BelosBlockGmresSolMgr.hpp>
 #include <BelosConfigDefs.hpp>
 #include <BelosLinearProblem.hpp>
 #include <BelosMultiVecTraits.hpp>
 #include <BelosOperatorTraits.hpp>
-#include <BelosSolverFactory.hpp>
-#include <BelosSolverManager.hpp>
+// #include <BelosSolverFactory.hpp>
+// #include <BelosSolverManager.hpp>
 #include <BelosTpetraAdapter.hpp>
 #include <BelosTypes.hpp>
 
@@ -88,11 +88,12 @@ int main(int argc, char *argv[]) {
     *out << "\n>> I. Create the system matrix for a " << matrixType << " problem.\n" << std::endl;
 
     Teuchos::ParameterList galeriList;
-    int nx, ny, nz;
-    nx = ny = nz = 10;
-    galeriList.set("nx", Teuchos::as<global_ordinal_type>(nx));
-    galeriList.set("ny", Teuchos::as<global_ordinal_type>(ny));
-    galeriList.set("nz", Teuchos::as<global_ordinal_type>(nz));
+    int nx = 10;
+    int ny = 10;
+    int nz = 10;
+    galeriList.set("nx", static_cast<global_ordinal_type>(nx));
+    galeriList.set("ny", static_cast<global_ordinal_type>(ny));
+    galeriList.set("nz", static_cast<global_ordinal_type>(nz));
     galeriList.set("matrixType", matrixType);
     RCP<const crs_matrix_type> matrix = buildMatrix(galeriList, comm);
 
@@ -112,8 +113,8 @@ int main(int argc, char *argv[]) {
     // RCP<vec_type> rhs = rcp(new vec_type(matrix->getRangeMap()));
     // rhs->putScalar(one);
 
-    x->describe(*allOut, Teuchos::VERB_EXTREME);
-    rhs->describe(*allOut, Teuchos::VERB_EXTREME);
+    // x->describe(*allOut, Teuchos::VERB_EXTREME);
+    // rhs->describe(*allOut, Teuchos::VERB_EXTREME);
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -144,7 +145,6 @@ int main(int argc, char *argv[]) {
     //   }
     // }
     // Construct an unpreconditioned linear problem instance.
-    //
     Belos::LinearProblem<scalar_type, multivec_type, operator_type> problem(matrix, x, rhs);
     problem.setInitResVec(rhs);
     bool set = problem.setProblem();
@@ -155,20 +155,22 @@ int main(int argc, char *argv[]) {
 
     Belos::BlockCGSolMgr<scalar_type, multivec_type, operator_type> solver(Teuchos::rcpFromRef(problem), Teuchos::rcpFromRef(belosList));
 
-    // RCP<Belos::SolverManager<scalar_type, multivec_type, operator_type> > solver;
-    // Belos::SolverFactory<scalar_type, multivec_type, operator_type> factory;
-    // solver = factory.create ("Block CG", Teuchos::rcpFromRef(belosList));
-
-    // *out << "\nDimension of matrix: " << numGlobalElements << "\n";
-    // *out << "Max number of Gmres iterations: " << maxIters << "\n";
-    // *out << "Relative residual tolerance: " << tol << "\n";
-    // *out << std::endl;
+    *out << "\nDimension of matrix: " << numGlobalElements
+        << "\nMax number of Gmres iterations: " << maxIters
+        << "\nRelative residual tolerance: " << tol
+        << "\n" << std::endl;
 
     Belos::ReturnType ret = solver.solve();
     if (ret == Belos::Unconverged)
     {
       *out << "Belos did not converge in " << solver.getNumIters() << " iterations." << std::endl;
       return -1;
+    }
+    else
+    {
+      *out << "Belos converged in " << solver.getNumIters()
+          << " iterations to an achieved tolerance of " << solver.achievedTol()
+          << " (< tol = " << tol << ")." << std::endl;
     }
 
     return 0;
