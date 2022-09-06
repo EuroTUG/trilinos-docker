@@ -13,7 +13,7 @@ project(ex_03_solve NONE)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Get Trilinos as one entity but require the packages being used
-find_package(Trilinos REQUIRED COMPONENTS Amesos2 Teuchos Tpetra)
+find_package(Trilinos REQUIRED PATHS /hdd/codes/mayrmt_trilinos/build_muelu_double_int_int/lib/cmake/Trilinos COMPONENTS Amesos2 Belos Galeri Ifpack2 Teuchos Tpetra)
 
 # Echo trilinos build info just for fun
 MESSAGE("\nFound Trilinos!  Here are the details: ")
