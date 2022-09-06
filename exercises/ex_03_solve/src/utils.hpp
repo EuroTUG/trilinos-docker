@@ -11,6 +11,7 @@
 #include <Teuchos_RCP.hpp>
 
 #include <Tpetra_CrsMatrix.hpp>
+#include <Tpetra_Vector.hpp>
 
 #include <Xpetra_CrsMatrix.hpp>
 #include <Xpetra_CrsMatrixWrap.hpp>
@@ -26,6 +27,7 @@ using GlobalOrdinal = Tpetra::CrsMatrix<>::global_ordinal_type;
 using Node = Tpetra::CrsMatrix<>::node_type;
 
 using Teuchos::RCP;
+using Teuchos::rcp;
 
 RCP<const Tpetra::CrsMatrix<Scalar,LocalOrdinal,GlobalOrdinal,Node>>
 buildMatrix(Teuchos::ParameterList& galeriList, RCP<const Teuchos::Comm<int>> comm)
@@ -83,4 +85,20 @@ buildMatrix(Teuchos::ParameterList& galeriList, RCP<const Teuchos::Comm<int>> co
   RCP<XTeptraCrsMatrix> tpetraCrsMatrix = problem->BuildMatrix();
 
   return tpetraCrsMatrix->getTpetra_CrsMatrix();
+}
+
+void createLinearSystem(Teuchos::ParameterList& galeriList, RCP<const Teuchos::Comm<int>> comm,
+    RCP<const Tpetra::CrsMatrix<Scalar,LocalOrdinal,GlobalOrdinal,Node>>& A,
+    RCP<Tpetra::Vector<Scalar,LocalOrdinal,GlobalOrdinal,Node>>& x,
+    RCP<Tpetra::Vector<Scalar,LocalOrdinal,GlobalOrdinal,Node>>& b)
+{
+  using Vector = Tpetra::Vector<Scalar,LocalOrdinal,GlobalOrdinal,Node>;
+
+  A = buildMatrix(galeriList, comm);
+  x = rcp(new Vector(A->getDomainMap(), true));
+  b = rcp(new Vector(A->getRangeMap(),true));
+
+  x->randomize();
+  A->apply(*x, *b);
+  x->putScalar(Teuchos::ScalarTraits<Scalar>::zero());
 }

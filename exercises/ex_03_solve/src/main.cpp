@@ -5,13 +5,8 @@
 #include "utils.hpp"
 
 #include <BelosBlockCGSolMgr.hpp>
-// #include <BelosBlockGmresSolMgr.hpp>
 #include <BelosConfigDefs.hpp>
 #include <BelosLinearProblem.hpp>
-#include <BelosMultiVecTraits.hpp>
-#include <BelosOperatorTraits.hpp>
-// #include <BelosSolverFactory.hpp>
-// #include <BelosSolverManager.hpp>
 #include <BelosTpetraAdapter.hpp>
 #include <BelosTypes.hpp>
 
@@ -42,13 +37,6 @@ int main(int argc, char *argv[]) {
   using multivec_type = Tpetra::MultiVector<scalar_type, local_ordinal_type, global_ordinal_type, node_type>;
   using operator_type = Tpetra::Operator<scalar_type, local_ordinal_type, global_ordinal_type, node_type>;
   using vec_type = Tpetra::Vector<scalar_type, local_ordinal_type, global_ordinal_type, node_type>;
-
-  // using scalar_type = multivec_type::scalar_type;
-  // using local_ordinal_type = multivec_type::local_ordinal_type;
-  // using global_ordinal_type = multivec_type::global_ordinal_type;
-
-  typedef Belos::OperatorTraits<scalar_type,multivec_type,operator_type> OPT;
-  typedef Belos::MultiVecTraits<scalar_type,multivec_type> MVT;
 
   // Read input parameters from command line
   Teuchos::CommandLineProcessor clp;
@@ -86,7 +74,7 @@ int main(int argc, char *argv[]) {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    *out << "\n>> I. Create the system matrix for a " << matrixType << " problem.\n" << std::endl;
+    *out << "\n>> I. Create linear system A*x=b for a " << matrixType << " problem.\n" << std::endl;
 
     Teuchos::ParameterList galeriList;
     int nx = 10;
@@ -96,30 +84,14 @@ int main(int argc, char *argv[]) {
     galeriList.set("ny", static_cast<global_ordinal_type>(ny));
     galeriList.set("nz", static_cast<global_ordinal_type>(nz));
     galeriList.set("matrixType", matrixType);
-    RCP<const crs_matrix_type> matrix = buildMatrix(galeriList, comm);
-
-    // matrix->describe(*allOut, Teuchos::VERB_EXTREME);
-
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    *out << "\n>> II. Create and empty solution vector and a right-hand side vector will all ones.\n" << std::endl;
-
-    RCP<vec_type> x = rcp(new vec_type(matrix->getDomainMap(), true));
-    RCP<vec_type> rhs = rcp(new vec_type(matrix->getRangeMap(),true));
-    MVT::MvRandom(*x);
-    OPT::Apply(*matrix, *x, *rhs);
-    MVT::MvInit(*x, zero);
-
-    // RCP<vec_type> x = rcp(new vec_type(matrix->getDomainMap(), true));
-    // RCP<vec_type> rhs = rcp(new vec_type(matrix->getRangeMap()));
-    // rhs->putScalar(one);
-
-    // x->describe(*allOut, Teuchos::VERB_EXTREME);
-    // rhs->describe(*allOut, Teuchos::VERB_EXTREME);
+    RCP<const crs_matrix_type> matrix = Teuchos::null;
+    RCP<vec_type> x = Teuchos::null;
+    RCP<vec_type> rhs = Teuchos::null;
+    createLinearSystem(galeriList, comm, matrix, x, rhs);
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    *out << "\n>> III. Create a CG solver from the Belos package.\n" << std::endl;
+    *out << "\n>> II. Create a CG solver from the Belos package.\n" << std::endl;
 
     const int numGlobalElements = rhs->getGlobalLength();
     if (maxIters == -1) {
@@ -155,6 +127,10 @@ int main(int argc, char *argv[]) {
         << "\nMax number of Gmres iterations: " << maxIters
         << "\nRelative residual tolerance: " << tol
         << "\n" << std::endl;
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    *out << "\n>> III. Solve.\n" << std::endl;
 
     // Perform the actual solve
     Belos::ReturnType ret = solver.solve();
