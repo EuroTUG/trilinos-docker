@@ -54,9 +54,8 @@ int main(int argc, char *argv[]) {
 
   scalar_type tol = 1.0e-4; clp.setOption("tol", &tol, "Tolerance to check for convergence of Krylov solver");
   int maxIters = 100; clp.setOption("maxIters", &maxIters, "Maximum number of iterations of the Krylov solver");
-  int outFrequency = 0; clp.setOption("outFrequency", &outFrequency, "Frequency of Belos iteration output.");
-
   bool usePreconditioner = false; clp.setOption("withPreconditioner", "noPreconditioner", &usePreconditioner, "Flag to activate/deactivate the preconditioner.");
+
   std::string relaxationType = "Jacobi"; clp.setOption("precType", &relaxationType, "Type of preconditioner [Jacobi, Gauss-Seidel, Symmetric Gauss-Seidel] (default: Jacobi)");
   int numSweeps = 1; clp.setOption("numSweeps", &numSweeps, "Number of relaxation sweeps in the preconditioner (default: 1)");
   double damping = 2./3.; clp.setOption("damping", &damping, "Damping parameter for relaxation preconditioner (default: 2/3)");
@@ -98,15 +97,19 @@ int main(int argc, char *argv[]) {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    *out << ">> II. Create a (preconditioned) CG solver from the Belos package." << std::endl;
+    *out << ">> II. Create a ";
+    if (usePreconditioner) *out << "preconditioned ";
+    *out << "GMRES solver from the Belos package." << std::endl;
 
     // Create Belos iterative linear solver
     RCP<solver_type> solver = Teuchos::null;
     RCP<ParameterList> solverParams = rcp (new ParameterList());
     {
+      int verbLevel = Belos::Errors + Belos::Warnings + Belos::FinalSummary;
+      solverParams->set( "Verbosity", verbLevel );
+
       solverParams->set("Maximum Iterations", maxIters);
       solverParams->set("Convergence Tolerance", tol);
-      solverParams->set("Output Frequency", outFrequency);
 
       /* START OF TODO: Create Belos solver */
       Belos::SolverFactory<scalar_type, multivec_type, operator_type> belosFactory;

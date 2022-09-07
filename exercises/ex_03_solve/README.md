@@ -103,8 +103,13 @@ To get a complete list of options, run `./ex_03_solve --help`.
 
    ```
    >> I. Create linear system A*x=b for a Laplace2D problem.
-   >> II. Create a (preconditioned) CG solver from the Belos package.
+   >> II. Create a GMRES solver from the Belos package.
    >> III. Solve the linear system.
+   Passed.......OR Combination ->
+     OK...........Number of Iterations = 20 < 100
+     Converged....(2-Norm Res Vec) / (2-Norm Prec Res0)
+                  residual [ 0 ] = 7.70474e-05 < 0.0001
+
    Belos converged in 20 iterations to an achieved tolerance of 7.70474e-05 (< tol = 0.0001).
    ```
 
@@ -114,20 +119,30 @@ To get a complete list of options, run `./ex_03_solve --help`.
 
    ```
    >> I. Create linear system A*x=b for a Laplace2D problem.
-   >> II. Create a (preconditioned) CG solver from the Belos package.
+   >> II. Create a GMRES solver from the Belos package.
    >> III. Solve the linear system.
+   Passed.......OR Combination ->
+     OK...........Number of Iterations = 32 < 100
+     Converged....(2-Norm Res Vec) / (2-Norm Prec Res0)
+                  residual [ 0 ] = 8.66916e-09 < 1e-08
+
    Belos converged in 32 iterations to an achieved tolerance of 8.66916e-09 (< tol = 1e-08).
    ```
 
-1. Run the solver in parallel on 4 MPI ranks to solve a `Elasticity3D` problem on a 25x12x30 mesh: `mpirun -np 4 ./ex_03_solve --matrixType=Elasticity3D --nx=25 --ny=12 --nz=30`
+1. Run the solver in parallel on 4 MPI ranks to solve a `Elasticity3D` problem on a 25x12x30 mesh up to a relative tolerance of `tol` = 1.0e-8 and allow 400 Krylov iterations at maximum: `mpirun -np 4 ./ex_03_solve --tol=1.0e-8  --maxIters=400 --matrixType=Elasticity3D --nx=25 --ny=12 --nz=30`
 
    Expected output:
 
    ```
    >> I. Create linear system A*x=b for a Elasticity3D problem.
-   >> II. Create a (preconditioned) CG solver from the Belos package.
+   >> II. Create a GMRES solver from the Belos package.
    >> III. Solve the linear system.
-   Belos converged in 32 iterations to an achieved tolerance of 9.58752e-05 (< tol = 0.0001).
+   Passed.......OR Combination ->
+     OK...........Number of Iterations = 377 < 400
+     Converged....(2-Norm Res Vec) / (2-Norm Prec Res0)
+                  residual [ 0 ] = 9.70154e-09 < 1e-08
+
+   Belos converged in 377 iterations to an achieved tolerance of 9.70154e-09 (< tol = 1e-08).
    ```
 
 Now, feel free to experiment with some solver settings, mesh sizes, etc.
@@ -163,3 +178,83 @@ and pass it to the preconditioner:
    ```cpp
    problem->setRightPrec(prec);
    ```
+
+Now, you can run examples with a _preconditioned_ Krylov solver.
+To study the effect of the preconditioner, we look at the last example from the unpreconditioned GMRES
+and examine different preconditioner settings.
+To enable the preconditioer, just pass the additional command line argument `--withPreconditioner`.
+
+1. Run the solver in parallel on 4 MPI ranks to solve a `Elasticity3D` problem on a 25x12x30 mesh up to a relative tolerance of `tol` = 1.0e-8 and allow 400 Krylov iterations at maximum and enable the default preconditioner: `mpirun -np 4 ./ex_03_solve --tol=1.0e-8  --maxIters=400 --matrixType=Elasticity3D --nx=25 --ny=12 --nz=30 --withPreconditioner`
+
+   Expected output:
+
+   ```
+   >> I. Create linear system A*x=b for a Elasticity3D problem.
+   >> II. Create a preconditioned GMRES solver from the Belos package.
+   >> III. Solve the linear system.
+   Passed.......OR Combination ->
+     OK...........Number of Iterations = 294 < 400
+     Converged....(2-Norm Res Vec) / (2-Norm Prec Res0)
+                  residual [ 0 ] = 9.46091e-09 < 1e-08
+
+   Belos converged in 294 iterations to an achieved tolerance of 9.46091e-09 (< tol = 1e-08).
+   ```
+
+   Through the preconditioner (in this case 1x sweep of damped Jacobi (damping = 2/3) per GMRES iteration),
+   the total number of iterations drops from 377 to 294.
+
+1. Run the solver in parallel on 4 MPI ranks to solve a `Elasticity3D` problem on a 25x12x30 mesh up to a relative tolerance of `tol` = 1.0e-8 and allow 400 Krylov iterations at maximum and enable 2 sweeps of the default preconditioner: `mpirun -np 4 ./ex_03_solve --tol=1.0e-8  --maxIters=400 --matrixType=Elasticity3D --nx=25 --ny=12 --nz=30 --withPreconditioner --numSweeps=2`
+
+   Expected output:
+
+   ```
+   >> I. Create linear system A*x=b for a Elasticity3D problem.
+   >> II. Create a preconditioned GMRES solver from the Belos package.
+   >> III. Solve the linear system.
+   Passed.......OR Combination ->
+     OK...........Number of Iterations = 154 < 400
+     Converged....(2-Norm Res Vec) / (2-Norm Prec Res0)
+                  residual [ 0 ] = 9.90015e-09 < 1e-08
+
+   Belos converged in 154 iterations to an achieved tolerance of 9.90015e-09 (< tol = 1e-08).
+   ```
+
+   Through the preconditioner (in this case 1x sweep of damped Jacobi (damping = 2/3) per GMRES iteration),
+   the total number of iterations drops from 377 to 294.
+
+1. Run the solver in parallel on 4 MPI ranks to solve a `Elasticity3D` problem on a 25x12x30 mesh up to a relative tolerance of `tol` = 1.0e-8 and allow 400 Krylov iterations at maximum and use 1 sweep of damped Gauss-Seidel as preconditioner: `mpirun -np 4 ./ex_03_solve --tol=1.0e-8  --maxIters=400 --matrixType=Elasticity3D --nx=25 --ny=12 --nz=30 --withPreconditioner --precType=Gauss-Seidel`
+
+   Expected output:
+
+   ```
+   >> I. Create linear system A*x=b for a Elasticity3D problem.
+   >> II. Create a preconditioned GMRES solver from the Belos package.
+   >> III. Solve the linear system.
+   Passed.......OR Combination ->
+     OK...........Number of Iterations = 248 < 400
+     Converged....(2-Norm Res Vec) / (2-Norm Prec Res0)
+                  residual [ 0 ] = 9.49484e-09 < 1e-08
+
+   Belos converged in 248 iterations to an achieved tolerance of 9.49484e-09 (< tol = 1e-08).
+   ```
+
+1. Run the solver in parallel on 4 MPI ranks to solve a `Elasticity3D` problem on a 25x12x30 mesh up to a relative tolerance of `tol` = 1.0e-8 and allow 400 Krylov iterations at maximum and use 2 sweeps of damped Symmetric Gauss-Seidel as preconditioner: `mpirun -np 4 ./ex_03_solve --tol=1.0e-8  --maxIters=400 --matrixType=Elasticity3D --nx=25 --ny=12 --nz=30 --withPreconditioner --precType="Symmetric Gauss-Seidel" --numSweeps=2`
+
+   Expected output:
+
+   ```
+   >> I. Create linear system A*x=b for a Elasticity3D problem.
+   >> II. Create a preconditioned GMRES solver from the Belos package.
+   >> III. Solve the linear system.
+   Passed.......OR Combination ->
+     OK...........Number of Iterations = 107 < 400
+     Converged....(2-Norm Res Vec) / (2-Norm Prec Res0)
+                  residual [ 0 ] = 8.79942e-09 < 1e-08
+
+   Belos converged in 107 iterations to an achieved tolerance of 8.79942e-09 (< tol = 1e-08).
+   ```
+
+As expected, the number of Krylov iterations until convergence goes down,
+when a stronger preconditioner is used.
+
+Now, feel free to experiment with even solver and preconditioner configurations, mesh sizes, etc.
