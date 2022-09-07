@@ -4,13 +4,19 @@
 
 #include "utils.hpp"
 
+#include <cstdlib>
+
 #include <BelosBlockCGSolMgr.hpp>
 #include <BelosConfigDefs.hpp>
 #include <BelosLinearProblem.hpp>
 #include <BelosTpetraAdapter.hpp>
 #include <BelosTypes.hpp>
 
+#include <Ifpack2_Factory.hpp>
+#include <Ifpack2_Preconditioner.hpp>
+
 #include <Teuchos_Array.hpp>
+#include <Teuchos_ParameterList.hpp>
 #include <Teuchos_RCP.hpp>
 #include <Teuchos_ScalarTraits.hpp>
 
@@ -23,6 +29,7 @@
 #include <Tpetra_Version.hpp>
 
 int main(int argc, char *argv[]) {
+  using Teuchos::ParameterList;
   using Teuchos::RCP;
   using Teuchos::rcp;
   using Teuchos::tuple;
@@ -36,15 +43,28 @@ int main(int argc, char *argv[]) {
   using map_type = Tpetra::Map<local_ordinal_type, global_ordinal_type, node_type>;
   using multivec_type = Tpetra::MultiVector<scalar_type, local_ordinal_type, global_ordinal_type, node_type>;
   using operator_type = Tpetra::Operator<scalar_type, local_ordinal_type, global_ordinal_type, node_type>;
+  using row_matrix_type = Tpetra::RowMatrix<>;
   using vec_type = Tpetra::Vector<scalar_type, local_ordinal_type, global_ordinal_type, node_type>;
+
+  using prec_type = Ifpack2::Preconditioner<>;
+  using problem_type = Belos::LinearProblem<scalar_type, multivec_type, operator_type>;
+  using solver_type = Belos::SolverManager<scalar_type, multivec_type, operator_type>;
 
   // Read input parameters from command line
   Teuchos::CommandLineProcessor clp;
-  Tpetra::global_size_t numGblIndices = 50; clp.setOption("n", &numGblIndices, "number of nodes / number of global indices (default: 50)");
   std::string matrixType = "Laplace2D"; clp.setOption("matrixType", &matrixType, "Type of problem to be solved [Laplace1D, Laplace2D, Laplace3D, Elasticity2D, Elasticity3D] (default: Laplace2D)");
+  global_ordinal_type nx = 10; clp.setOption("nx", &nx, "Number of mesh nodes in x-direction");
+  global_ordinal_type ny = 10; clp.setOption("ny", &ny, "Number of mesh nodes in y-direction");
+  global_ordinal_type nz = 10; clp.setOption("nz", &nz, "Number of mesh nodes in z-direction");
+
   scalar_type tol = 1.0e-4; clp.setOption("tol", &tol, "Tolerance to check for convergence of Krylov solver");
   int maxIters = -1; clp.setOption("maxIters", &maxIters, "Maximum number of iterations of the Krylov solver");
   int outFrequency = 0; clp.setOption("outFrequency", &outFrequency, "Frequency of Belos iteration output.");
+
+  bool usePreconditioner = false; clp.setOption("withPreconditioner", "noPreconditioner", &usePreconditioner, "Flag to activate/deactivate the preconditioner.");
+  std::string relaxationType = "Jacobi"; clp.setOption("precType", &relaxationType, "Type of preconditioner [Jacobi, Gauss-Seidel, Symmetric Gauss-Seidel] (default: Jacobi)");
+  int numSweeps = 1; clp.setOption("numSweeps", &numSweeps, "Number of relaxation sweeps in the preconditioner (default: 1)");
+  double damping = 2./3.; clp.setOption("damping", &damping, "Damping parameter for relaxation preconditioner (default: 2/3)");
 
   switch (clp.parse(argc, argv)) {
     case Teuchos::CommandLineProcessor::PARSE_HELP_PRINTED:        return EXIT_SUCCESS;
@@ -64,25 +84,17 @@ int main(int argc, char *argv[]) {
     const size_t numProcs = comm->getSize();
 
     // Create an output stream
-    RCP<Teuchos::FancyOStream> allOut = Teuchos::fancyOStream(Teuchos::rcpFromRef(std::cout));
     RCP<Teuchos::FancyOStream> out = Teuchos::fancyOStream(Teuchos::rcpFromRef(std::cout));
     out->setOutputToRootOnly(0);
-
-    // Define some useful scalar values
-    const scalar_type zero = Teuchos::ScalarTraits<scalar_type>::zero();
-    const scalar_type one = Teuchos::ScalarTraits<scalar_type>::one();
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     *out << "\n>> I. Create linear system A*x=b for a " << matrixType << " problem.\n" << std::endl;
 
-    Teuchos::ParameterList galeriList;
-    int nx = 10;
-    int ny = 10;
-    int nz = 10;
-    galeriList.set("nx", static_cast<global_ordinal_type>(nx));
-    galeriList.set("ny", static_cast<global_ordinal_type>(ny));
-    galeriList.set("nz", static_cast<global_ordinal_type>(nz));
+    ParameterList galeriList;
+    galeriList.set("nx", nx);
+    galeriList.set("ny", ny);
+    galeriList.set("nz", nz);
     galeriList.set("matrixType", matrixType);
     RCP<const crs_matrix_type> matrix = Teuchos::null;
     RCP<vec_type> x = Teuchos::null;
@@ -91,61 +103,72 @@ int main(int argc, char *argv[]) {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    *out << "\n>> II. Create a CG solver from the Belos package.\n" << std::endl;
+    *out << "\n>> II. Create a (preconditioned) CG solver from the Belos package.\n" << std::endl;
 
-    const int numGlobalElements = rhs->getGlobalLength();
-    if (maxIters == -1) {
-      maxIters = numGlobalElements - 1; // maximum number of iterations to run
-    }
-    //
-    Teuchos::ParameterList belosList;
-    belosList.set( "Maximum Iterations", maxIters);       // Maximum number of iterations allowed
-    belosList.set( "Convergence Tolerance", tol);         // Relative convergence tolerance requested
-    belosList.set( "Num Blocks", 100);                    // Maximum number of blocks in Krylov subspace (max subspace size)
-    belosList.set( "Flexible Gmres", false);              // Do not use FGMRES
-
-    // Configure verbosity of the Belos solver
-    int verbLevel = Belos::Errors + Belos::Warnings;
-    verbLevel += Belos::TimingDetails + Belos::FinalSummary + Belos::StatusTestDetails;
-    belosList.set( "Verbosity", verbLevel );
-    if (outFrequency > 0) belosList.set( "Output Frequency", outFrequency);
-
-    // Construct an unpreconditioned linear problem instance.
-    Belos::LinearProblem<scalar_type, multivec_type, operator_type> problem(matrix, x, rhs);
-    problem.setInitResVec(rhs);
-    bool set = problem.setProblem();
-    if (set == false) {
-      *out << std::endl << "ERROR:  Belos::LinearProblem failed to set up correctly!" << std::endl;
-      return -1;
-    }
-
-    // Create the actual solver object
-    Belos::BlockCGSolMgr<scalar_type, multivec_type, operator_type> solver(Teuchos::rcpFromRef(problem), Teuchos::rcpFromRef(belosList));
-
-    // Print some statistics
-    *out << "\nDimension of matrix: " << numGlobalElements
-        << "\nMax number of Gmres iterations: " << maxIters
-        << "\nRelative residual tolerance: " << tol
-        << "\n" << std::endl;
-
-    ////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////
-    *out << "\n>> III. Solve.\n" << std::endl;
-
-    // Perform the actual solve
-    Belos::ReturnType ret = solver.solve();
-    if (ret == Belos::Unconverged)
+    // Create Belos iterative linear solver
+    RCP<solver_type> solver = Teuchos::null;
+    RCP<ParameterList> solverParams = rcp (new ParameterList());
     {
-      *out << "Belos did not converge in " << solver.getNumIters() << " iterations." << std::endl;
-      return -1;
+      Belos::SolverFactory<scalar_type, multivec_type, operator_type> belosFactory;
+      solver = belosFactory.create ("GMRES", solverParams);
     }
-    else
-    {
-      *out << "Belos converged in " << solver.getNumIters()
-          << " iterations to an achieved tolerance of " << solver.achievedTol()
-          << " (< tol = " << tol << ")." << std::endl;
+    if (solver.is_null ()) {
+      if (comm->getRank () == 0) {
+        cerr << "Failed to create Belos solver!" << endl;
+      }
+      return EXIT_FAILURE;
     }
 
-    return 0;
+    // Optionally, create Ifpack2 preconditioner.
+    RCP<prec_type> prec;
+    if (usePreconditioner)
+    {
+      prec = Ifpack2::Factory::create<row_matrix_type> ("RELAXATION", matrix);
+      if (prec.is_null ()) {
+        *out << "Failed to create Ifpack2 preconditioner!" << std::endl;
+        return EXIT_FAILURE;
+      }
+
+      // Pass parameters to the preconditioner
+      ParameterList precParams;
+      precParams.set("relaxation: type", relaxationType);
+      precParams.set("relaxation: sweeps", numSweeps);
+      precParams.set("relaxation: damping factor", damping);
+      prec->setParameters(precParams);
+
+      // Setup the preconditioner
+      prec->initialize ();
+      prec->compute ();
+    }
+
+    // Set up the linear problem to solve.
+    RCP<multivec_type> X = rcp(new multivec_type(matrix->getDomainMap(), rhs->getNumVectors()));
+    RCP<problem_type> problem;
+    {
+      problem = rcp(new problem_type (matrix, x, rhs));
+      if (!prec.is_null())
+        problem->setRightPrec(prec);
+
+      problem->setProblem();
+      solver->setProblem(problem);
+    }
+
+    // Solve the linear system.
+    {
+      Belos::ReturnType solveResult = solver->solve();
+      if (solveResult == Belos::Unconverged)
+      {
+        *out << "Belos did not converge in " << solver->getNumIters() << " iterations." << std::endl;
+        return EXIT_FAILURE;
+      }
+      else
+      {
+        *out << "Belos converged in " << solver->getNumIters()
+            << " iterations to an achieved tolerance of " << solver->achievedTol()
+            << " (< tol = " << tol << ")." << std::endl;
+      }
+    }
+
+    return EXIT_SUCCESS;
   }
 }
