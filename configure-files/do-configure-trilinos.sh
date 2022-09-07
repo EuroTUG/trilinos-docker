@@ -9,7 +9,6 @@ rm -rf CMake*
 
 cmake \
     -D CMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
-    -D CMAKE_INSTALL_PATH:STRING=${INSTALL_DIR} \
     -D CMAKE_CXX_FLAGS:STRING="" \
     -D CMAKE_CXX_STANDARD:STRING=14 \
     -D CMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
@@ -24,13 +23,20 @@ cmake \
     -D Trilinos_ENABLE_Amesos2:BOOL=ON \
     -D Amesos2_ENABLE_TESTS:BOOL=ON \
     -D Trilinos_ENABLE_Belos:BOOL=ON \
+      -D Belos_ENABLE_Tpetra:BOOL=ON \
     -D Belos_ENABLE_EXAMPLES:BOOL=ON \
     -D Belos_ENABLE_TESTS:BOOL=ON \
     -D Trilinos_ENABLE_Galeri:BOOL=ON \
+      -D Galeri_ENABLE_Xpetra:BOOL=ON \
     -D Trilinos_ENABLE_Ifpack2:BOOL=ON \
     -D Trilinos_ENABLE_TESTS:BOOL=ON \
     -D Kokkos_ENABLE_SERIAL:BOOL=ON \
+    -D Trilinos_ENABLE_Teuchos:BOOL=ON \
     -D Trilinos_ENABLE_Tpetra:BOOL=ON \
+      -D Tpetra_ENABLE_DEPRECATED_CODE:BOOL=ON \
+    -D Trilinos_ENABLE_Xpetra:BOOL=ON \
+      -D Xpetra_ENABLE_Experimental:BOOL=ON \
+      -D Xpetra_ENABLE_Kokkos_Refactor:BOOL=ON \
     -D Tpetra_ENABLE_TESTS:BOOL=ON \
     \
     -D TPL_ENABLE_MPI:BOOL=ON \

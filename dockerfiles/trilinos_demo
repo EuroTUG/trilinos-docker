@@ -32,6 +32,7 @@ FROM suitesparse AS trilinos
 
 ARG TRILINOS_CONFIGFILE=do-configure-trilinos.sh
 ARG TRILINOS_VERSION=13-4-0
+ARG GALERI_MISSING_FILE=Galeri_Exception.h
 
 WORKDIR /opt/trilinos/
 RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-release-$TRILINOS_VERSION.tar.gz
@@ -49,6 +50,9 @@ COPY $TRILINOS_CONFIGFILE /opt/trilinos/build/do-configure-trilinos.sh
 WORKDIR /opt/trilinos/build
 RUN ./do-configure-trilinos.sh
 RUN make -j4 && make install
+
+# copy missing header to include/ in install directory
+COPY $GALERI_MISSING_FILE /usr/local/include/
 
 #################
 # trilinos_demo #
