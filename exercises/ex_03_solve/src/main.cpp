@@ -15,18 +15,14 @@
 #include <Ifpack2_Factory.hpp>
 #include <Ifpack2_Preconditioner.hpp>
 
-#include <Teuchos_Array.hpp>
 #include <Teuchos_ParameterList.hpp>
 #include <Teuchos_RCP.hpp>
-#include <Teuchos_ScalarTraits.hpp>
 
 #include <Tpetra_Core.hpp>
 #include <Tpetra_CrsMatrix.hpp>
-#include <Tpetra_Map.hpp>
 #include <Tpetra_MultiVector.hpp>
 #include <Tpetra_Operator.hpp>
 #include <Tpetra_Vector.hpp>
-#include <Tpetra_Version.hpp>
 
 int main(int argc, char *argv[]) {
   using Teuchos::ParameterList;
@@ -40,7 +36,6 @@ int main(int argc, char *argv[]) {
   using node_type = Tpetra::MultiVector<>::node_type;
 
   using crs_matrix_type = Tpetra::CrsMatrix<scalar_type, local_ordinal_type, global_ordinal_type, node_type>;
-  using map_type = Tpetra::Map<local_ordinal_type, global_ordinal_type, node_type>;
   using multivec_type = Tpetra::MultiVector<scalar_type, local_ordinal_type, global_ordinal_type, node_type>;
   using operator_type = Tpetra::Operator<scalar_type, local_ordinal_type, global_ordinal_type, node_type>;
   using row_matrix_type = Tpetra::RowMatrix<>;
@@ -89,7 +84,7 @@ int main(int argc, char *argv[]) {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    *out << "\n>> I. Create linear system A*x=b for a " << matrixType << " problem.\n" << std::endl;
+    *out << ">> I. Create linear system A*x=b for a " << matrixType << " problem." << std::endl;
 
     ParameterList galeriList;
     galeriList.set("nx", nx);
@@ -103,7 +98,7 @@ int main(int argc, char *argv[]) {
 
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    *out << "\n>> II. Create a (preconditioned) CG solver from the Belos package.\n" << std::endl;
+    *out << ">> II. Create a (preconditioned) CG solver from the Belos package." << std::endl;
 
     // Create Belos iterative linear solver
     RCP<solver_type> solver = Teuchos::null;
@@ -120,7 +115,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Optionally, create Ifpack2 preconditioner.
-    RCP<prec_type> prec;
+    RCP<prec_type> prec = Teuchos::null;
     if (usePreconditioner)
     {
       prec = Ifpack2::Factory::create<row_matrix_type> ("RELAXATION", matrix);
@@ -142,8 +137,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Set up the linear problem to solve.
-    RCP<multivec_type> X = rcp(new multivec_type(matrix->getDomainMap(), rhs->getNumVectors()));
-    RCP<problem_type> problem;
+    RCP<problem_type> problem = Teuchos::null;
     {
       problem = rcp(new problem_type (matrix, x, rhs));
       if (!prec.is_null())
@@ -152,6 +146,10 @@ int main(int argc, char *argv[]) {
       problem->setProblem();
       solver->setProblem(problem);
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
+    *out << ">> III. Solve the linear system." << std::endl;
 
     // Solve the linear system.
     {
