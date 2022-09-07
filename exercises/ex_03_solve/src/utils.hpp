@@ -1,4 +1,7 @@
 
+#ifndef _UTILS_
+#define _UTILS_
+
 #include <string>
 
 #include <Galeri_XpetraProblemFactory.hpp>
@@ -102,3 +105,5 @@ void createLinearSystem(Teuchos::ParameterList& galeriList, RCP<const Teuchos::C
   A->apply(*x, *b);
   x->putScalar(Teuchos::ScalarTraits<Scalar>::zero());
 }
+
+#endif
