@@ -48,5 +48,5 @@ int main(int argc, char *argv[]) {
   // called MPI_Init.  Likewise, it calls Kokkos::finalize, if its
   // constructor called Kokkos::initialize.
 
-  return 0;
+  return EXIT_SUCCESS;
 }
