@@ -112,8 +112,8 @@ int main(int argc, char *argv[]) {
       solverParams->set("Convergence Tolerance", tol);
 
       /* START OF TODO: Create Belos solver */
-      Belos::SolverFactory<scalar_type, multivec_type, operator_type> belosFactory;
-      solver = belosFactory.create ("GMRES", solverParams);
+
+
       /* END OF TODO: Create Belos solver */
     }
     if (solver.is_null ()) {
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
     if (usePreconditioner)
     {
       /* START OF TODO: Create preconditioner */
-      prec = Ifpack2::Factory::create<row_matrix_type> ("RELAXATION", matrix);
+
       /* END OF TODO: Create preconditioner */
       if (prec.is_null ()) {
         *out << "Failed to create Ifpack2 preconditioner!" << std::endl;
@@ -137,17 +137,17 @@ int main(int argc, char *argv[]) {
 
       // Pass parameters to the preconditioner
       /* START OF TODO: Configure preconditioner */
-      ParameterList precParams;
-      precParams.set("relaxation: type", relaxationType);
-      precParams.set("relaxation: sweeps", numSweeps);
-      precParams.set("relaxation: damping factor", damping);
-      prec->setParameters(precParams);
+
+
+
+
+
       /* END OF TODO: Configure preconditioner */
 
       // Setup the preconditioner
       /* START OF TODO: Setup the preconditioner */
-      prec->initialize ();
-      prec->compute ();
+
+
       /* END OF TODO: Setup the preconditioner */
     }
 
@@ -155,18 +155,18 @@ int main(int argc, char *argv[]) {
     RCP<problem_type> problem = Teuchos::null;
     {
       /* START OF TODO: Define linear problem */
-      problem = rcp(new problem_type (matrix, x, rhs));
+
       /* END OF TODO: Define linear problem */
 
       if (!prec.is_null()) {
         /* START OF TODO: Insert preconditioner */
-        problem->setRightPrec(prec);
+
         /* END OF TODO: Insert preconditioner */
       }
 
       /* START OF TODO: Set the linear problem */
-      problem->setProblem();
-      solver->setProblem(problem);
+
+
       /* END OF TODO: Set the linear problem */
     }
 
@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
     // Solve the linear system.
     {
       /* START OF TODO: Solve */
-      Belos::ReturnType solveResult = solver->solve();
+
       /* END OF TODO: Solve */
       if (solveResult == Belos::Unconverged)
       {
