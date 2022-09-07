@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
   global_ordinal_type nz = 10; clp.setOption("nz", &nz, "Number of mesh nodes in z-direction");
 
   scalar_type tol = 1.0e-4; clp.setOption("tol", &tol, "Tolerance to check for convergence of Krylov solver");
-  int maxIters = -1; clp.setOption("maxIters", &maxIters, "Maximum number of iterations of the Krylov solver");
+  int maxIters = 100; clp.setOption("maxIters", &maxIters, "Maximum number of iterations of the Krylov solver");
   int outFrequency = 0; clp.setOption("outFrequency", &outFrequency, "Frequency of Belos iteration output.");
 
   bool usePreconditioner = false; clp.setOption("withPreconditioner", "noPreconditioner", &usePreconditioner, "Flag to activate/deactivate the preconditioner.");
@@ -104,8 +104,14 @@ int main(int argc, char *argv[]) {
     RCP<solver_type> solver = Teuchos::null;
     RCP<ParameterList> solverParams = rcp (new ParameterList());
     {
+      solverParams->set("Maximum Iterations", maxIters);
+      solverParams->set("Convergence Tolerance", tol);
+      solverParams->set("Output Frequency", outFrequency);
+
+      /* START OF TODO: Create Belos solver */
       Belos::SolverFactory<scalar_type, multivec_type, operator_type> belosFactory;
       solver = belosFactory.create ("GMRES", solverParams);
+      /* END OF TODO: Create Belos solver */
     }
     if (solver.is_null ()) {
       if (comm->getRank () == 0) {
@@ -118,33 +124,47 @@ int main(int argc, char *argv[]) {
     RCP<prec_type> prec = Teuchos::null;
     if (usePreconditioner)
     {
+      /* START OF TODO: Create preconditioner */
       prec = Ifpack2::Factory::create<row_matrix_type> ("RELAXATION", matrix);
+      /* END OF TODO: Create preconditioner */
       if (prec.is_null ()) {
         *out << "Failed to create Ifpack2 preconditioner!" << std::endl;
         return EXIT_FAILURE;
       }
 
       // Pass parameters to the preconditioner
+      /* START OF TODO: Configure preconditioner */
       ParameterList precParams;
       precParams.set("relaxation: type", relaxationType);
       precParams.set("relaxation: sweeps", numSweeps);
       precParams.set("relaxation: damping factor", damping);
       prec->setParameters(precParams);
+      /* END OF TODO: Configure preconditioner */
 
       // Setup the preconditioner
+      /* START OF TODO: Setup the preconditioner */
       prec->initialize ();
       prec->compute ();
+      /* END OF TODO: Setup the preconditioner */
     }
 
     // Set up the linear problem to solve.
     RCP<problem_type> problem = Teuchos::null;
     {
+      /* START OF TODO: Define linear problem */
       problem = rcp(new problem_type (matrix, x, rhs));
-      if (!prec.is_null())
-        problem->setRightPrec(prec);
+      /* END OF TODO: Define linear problem */
 
+      if (!prec.is_null()) {
+        /* START OF TODO: Insert preconditioner */
+        problem->setRightPrec(prec);
+        /* END OF TODO: Insert preconditioner */
+      }
+
+      /* START OF TODO: Set the linear problem */
       problem->setProblem();
       solver->setProblem(problem);
+      /* END OF TODO: Set the linear problem */
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -153,7 +173,9 @@ int main(int argc, char *argv[]) {
 
     // Solve the linear system.
     {
+      /* START OF TODO: Solve */
       Belos::ReturnType solveResult = solver->solve();
+      /* END OF TODO: Solve */
       if (solveResult == Belos::Unconverged)
       {
         *out << "Belos did not converge in " << solver->getNumIters() << " iterations." << std::endl;
