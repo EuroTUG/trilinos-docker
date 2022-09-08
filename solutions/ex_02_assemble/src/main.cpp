@@ -160,6 +160,6 @@ int main(int argc, char *argv[]) {
 
     x->describe(*out, Teuchos::VERB_EXTREME);
 
-    return 0;
+    return EXIT_SUCCESS;
   }
 }
