@@ -37,6 +37,10 @@ cmake \
     -D Trilinos_ENABLE_Xpetra:BOOL=ON \
       -D Xpetra_ENABLE_Experimental:BOOL=ON \
       -D Xpetra_ENABLE_Kokkos_Refactor:BOOL=ON \
+    -D Trilinos_ENABLE_Thyra=ON \
+    -D Trilinos_ENABLE_Stratimikos=ON \
+    -D Trilinos_ENABLE_MueLu=ON \
+      -D MueLu_ENABLE_EXAMPLES=ON \
     -D Tpetra_ENABLE_TESTS:BOOL=ON \
     \
     -D TPL_ENABLE_MPI:BOOL=ON \
