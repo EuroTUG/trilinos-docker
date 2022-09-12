@@ -146,8 +146,8 @@ int main(int argc, char *argv[]) {
 
       // Setup the preconditioner
       /* START OF TODO: Setup the preconditioner */
-      prec->initialize ();
-      prec->compute ();
+      prec->initialize();
+      prec->compute();
       /* END OF TODO: Setup the preconditioner */
     }
 

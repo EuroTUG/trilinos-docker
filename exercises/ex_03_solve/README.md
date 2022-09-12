@@ -169,8 +169,8 @@ and pass it to the preconditioner:
 1. At `/*START OF TODO: Setup the preconditioner*/`, initialize and compute the preconditioner such that it is ready to be used:
 
    ```cpp
-   prec->initialize ();
-   prec->compute ();
+   prec->initialize();
+   prec->compute();
    ```
 
 1. At `/* START OF TODO: Insert preconditioner */`, tell the linear problem about the existence of the preconditioner, such that it can then be called from the Krylov solver:
