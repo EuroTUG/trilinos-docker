@@ -61,7 +61,7 @@ Places, where modifications are required, are encapsulated by the lines
    RCP<const map_type> map = rcp(new map_type(numGblIndices, indexBase, comm));
    ```
 
-   Make sure to include the necessary header file `Teuchos_Map.hpp`.
+   Make sure to include the necessary header file `Tpetra_Map.hpp`.
 
 1. At `/* START OF TODO: Create empty matrix */`, create an empty `Tpetra::CrsMatrix<...>` with an estimated three entries per row:
    ```cpp
