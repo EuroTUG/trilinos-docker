@@ -28,6 +28,7 @@ cmake \
     -D Kokkos_ENABLE_SERIAL:BOOL=ON \
   -D Trilinos_ENABLE_Tpetra:BOOL=ON \
   -D Trilinos_ENABLE_Amesos2:BOOL=ON \
+  -D Trilinos_ENABLE_Zoltan2:BOOL=ON \  
   \
   -D TPL_ENABLE_MPI:BOOL=ON \
   -D TPL_ENABLE_BLAS:BOOL=ON \
