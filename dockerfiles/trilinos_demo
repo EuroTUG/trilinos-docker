@@ -64,6 +64,8 @@ WORKDIR /opt/trilinos/build
 RUN ./do-configure-trilinos.sh
 RUN make -j4 && make install
 
+ENV CMAKE_PREFIX_PATH=/opt/trilinos/install:$CMAKE_PREFIX_PATH 
+
 #################
 # trilinos_demo #
 #################
