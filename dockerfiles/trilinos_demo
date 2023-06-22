@@ -46,6 +46,10 @@ RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-rel
     cmake --build build --parallel 4 && cmake --install build --prefix . && \
     rm -rf build source
 
+# kokkos
+RUN git clone --depth 1 --branch 4.0.01 https://github.com/kokkos/kokkos.git && cmake -S kokkos -B kokkos/build -DKokkos_ENABLE_OPENMP=ON && cmake --build kokkos/build/ --parallel 4 && cmake --install kokkos/build/ --prefix /opt/kokkos && rm -rf kokkos/
+RUN git clone --depth 1 https://github.com/kokkos/kokkos-tutorials.git /opt/kokkos-tutorials
+
 # copy missing header to include/ in install directory
 COPY $GALERI_MISSING_FILE /usr/local/include/
 
