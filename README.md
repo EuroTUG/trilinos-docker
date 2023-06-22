@@ -82,8 +82,8 @@ in the main directory of the repository.
 
 + **EuroTUG**
 
-  + [Website](https://eurotug.github.op)
-  + [Email](mailto:eurotug2022@unibw.de)
+  + [Website](https://eurotug.github.io)
+  + [Email](mailto:eurotug@tudelft.nl)
 
 + **Trilinos**
 
