@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TYPE=RELEASE
+BUILD_TYPE=RELEASE
 
 BASE_DIR=/opt/trilinos/source
 INSTALL_DIR=/opt/trilinos/install
