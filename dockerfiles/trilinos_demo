@@ -34,22 +34,17 @@ ARG TRILINOS_CONFIGFILE=do-configure-trilinos.sh
 ARG TRILINOS_VERSION=13-4-0
 ARG GALERI_MISSING_FILE=Galeri_Exception.h
 
-WORKDIR /opt/trilinos/
-RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-release-$TRILINOS_VERSION.tar.gz
-
-# extract trilinos source file
-RUN mkdir /opt/trilinos/build
-RUN mkdir /opt/trilinos/install
-RUN tar xfz /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz
-RUN mv /opt/trilinos/Trilinos-trilinos-release-$TRILINOS_VERSION /opt/trilinos/source
-RUN rm -f /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz
-
-# copy configure script to build directory
-COPY $TRILINOS_CONFIGFILE /opt/trilinos/build/do-configure-trilinos.sh
-
-WORKDIR /opt/trilinos/build
-RUN ./do-configure-trilinos.sh
-RUN make -j4 && make install
+WORKDIR /opt/trilinos
+COPY $TRILINOS_CONFIGFILE /opt/trilinos/do-configure-trilinos.sh
+RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-release-$TRILINOS_VERSION.tar.gz && \
+    mkdir source && \
+    tar xfz /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz -C /opt/trilinos/source --strip-components=1 && \
+    rm -f /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz && \
+    mkdir build && pushd build && \
+    ../do-configure-trilinos.sh && popd && \
+    rm do-configure-trilinos.sh && \
+    cmake --build build --parallel 4 && cmake --install build --prefix . && \
+    rm -rf build source
 
 # copy missing header to include/ in install directory
 COPY $GALERI_MISSING_FILE /usr/local/include/
