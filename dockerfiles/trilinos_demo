@@ -7,14 +7,28 @@ RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
 RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
 
 RUN yum -y update
-RUN yum -y install less wget emacs make cmake m4 git gcc gcc-gfortran gcc-c++ blas lapack mpich mpich-devel boost boost-devel
+RUN yum -y install less wget emacs make m4 git gcc gcc-gfortran gcc-c++ blas lapack mpich mpich-devel boost boost-devel openssl-devel
 
 ENV PATH=/usr/lib64/mpich/bin/:$PATH
 
 ###############
+# cmake       #
+###############
+FROM base AS cmake
+
+# Cmake
+WORKDIR /opt/cmake/
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.0-rc3/cmake-3.27.0-rc3.tar.gz
+RUN tar xfz /opt/cmake/cmake-3.27.0-rc3.tar.gz
+RUN mv /opt/cmake/cmake-3.27.0-rc3/ /opt/cmake/source
+RUN rm cmake-3.27.0-rc3.tar.gz
+WORKDIR /opt/cmake/source
+RUN ./bootstrap && make && make install
+
+###############
 # suitesparse #
 ###############
-FROM base AS suitesparse
+FROM cmake AS suitesparse
 
 # Suitesparse
 WORKDIR /opt/suitesparse/
@@ -31,8 +45,7 @@ RUN make BLAS=/usr/lib64/libblas.so.3 LAPACK=/usr/lib64/liblapack.so.3 && make i
 FROM suitesparse AS trilinos
 
 ARG TRILINOS_CONFIGFILE=do-configure-trilinos.sh
-ARG TRILINOS_VERSION=13-4-0
-ARG GALERI_MISSING_FILE=Galeri_Exception.h
+ARG TRILINOS_VERSION=14-2-0
 
 WORKDIR /opt/trilinos/
 RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-release-$TRILINOS_VERSION.tar.gz
@@ -50,9 +63,6 @@ COPY $TRILINOS_CONFIGFILE /opt/trilinos/build/do-configure-trilinos.sh
 WORKDIR /opt/trilinos/build
 RUN ./do-configure-trilinos.sh
 RUN make -j4 && make install
-
-# copy missing header to include/ in install directory
-COPY $GALERI_MISSING_FILE /usr/local/include/
 
 #################
 # trilinos_demo #
