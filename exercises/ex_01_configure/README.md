@@ -81,7 +81,7 @@ To start the configuration process, we will then just execute this script.
       -D CMAKE_BUILD_TYPE:STRING=${BUILD_TYPE} \
       -D CMAKE_INSTALL_PATH:STRING=${TRILINOS_INSTALL} \
       -D CMAKE_CXX_FLAGS:STRING="" \
-      -D CMAKE_CXX_STANDARD:STRING=14 \
+      -D CMAKE_CXX_STANDARD:STRING=17 \
       -D CMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
       \
       -D Trilinos_ASSERT_MISSING_PACKAGES:BOOL=ON \
