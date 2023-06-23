@@ -22,7 +22,7 @@ cmake \
     -D Trilinos_VERBOSE_CONFIGURE:BOOL=OFF \
     \
     -D Trilinos_ENABLE_Amesos2:BOOL=ON \
-    -D Amesos2_ENABLE_TESTS:BOOL=ON \
+      -D Amesos2_ENABLE_TESTS:BOOL=ON \
     -D Trilinos_ENABLE_Belos:BOOL=ON \
       -D Belos_ENABLE_Tpetra:BOOL=ON \
     -D Belos_ENABLE_EXAMPLES:BOOL=ON \
@@ -45,8 +45,5 @@ cmake \
     -D TPL_BLAS_LIBRARIES:FILEPATH=/usr/lib64/libblas.so.3 \
     -D TPL_ENABLE_LAPACK:BOOL=ON \
     -D TPL_LAPACK_LIBRARIES:FILEPATH=/usr/lib64/liblapack.so.3 \
-    -D TPL_ENABLE_UMFPACK:BOOL=ON \
-    -D UMFPACK_INCLUDE_DIRS:FILEPATH=/opt/suitesparse/install/include \
-    -D UMFPACK_LIBRARY_DIRS:FILEPATH=/opt/suitesparse/install/lib \
     \
     ${BASE_DIR}

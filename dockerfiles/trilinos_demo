@@ -26,24 +26,10 @@ RUN CMAKE_VERSION=3.27.0-rc3 && \
     rm cmake*
 ENV PATH=/opt/cmake/bin:$PATH
 
-###############
-# suitesparse #
-###############
-FROM cmake AS suitesparse
-
-# Suitesparse
-WORKDIR /opt/suitesparse/
-RUN wget -nv https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v5.4.0.tar.gz
-RUN tar xfz /opt/suitesparse/v5.4.0.tar.gz
-RUN mv /opt/suitesparse/SuiteSparse-5.4.0/ /opt/suitesparse/source
-RUN rm /opt/suitesparse/v5.4.0.tar.gz
-WORKDIR /opt/suitesparse/source
-RUN make BLAS=/usr/lib64/libblas.so.3 LAPACK=/usr/lib64/liblapack.so.3 && make install BLAS=/usr/lib64/libblas.so.3 LAPACK=/usr/lib64/liblapack.so.3 INSTALL=/usr/local
-
 ############
 # trilinos #
 ############
-FROM suitesparse AS trilinos
+FROM cmake AS trilinos
 
 ARG TRILINOS_CONFIGFILE=do-configure-trilinos.sh
 ARG TRILINOS_VERSION=14-2-0
