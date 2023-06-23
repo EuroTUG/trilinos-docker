@@ -103,9 +103,6 @@ To start the configuration process, we will then just execute this script.
       -D TPL_ENABLE_BLAS:BOOL=ON \
       -D TPL_ENABLE_LAPACK:BOOL=ON \
         -D TPL_LAPACK_LIBRARIES:FILEPATH=/usr/lib64/liblapack.so.3 \
-      -D TPL_ENABLE_UMFPACK:BOOL=ON \
-        -D UMFPACK_INCLUDE_DIRS:FILEPATH=/opt/suitesparse/install/include \
-        -D UMFPACK_LIBRARY_DIRS:FILEPATH=/opt/suitesparse/install/lib \
       \
       ${TRILINOS_SOURCE}
 	```
