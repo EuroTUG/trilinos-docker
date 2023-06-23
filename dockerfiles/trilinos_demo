@@ -17,13 +17,14 @@ ENV PATH=/usr/lib64/mpich/bin/:$PATH
 FROM base AS cmake
 
 # Cmake
-WORKDIR /opt/cmake/
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.0-rc3/cmake-3.27.0-rc3.tar.gz
-RUN tar xfz /opt/cmake/cmake-3.27.0-rc3.tar.gz
-RUN mv /opt/cmake/cmake-3.27.0-rc3/ /opt/cmake/source
-RUN rm cmake-3.27.0-rc3.tar.gz
-WORKDIR /opt/cmake/source
-RUN ./bootstrap && make && make install
+RUN CMAKE_VERSION=3.27.0-rc3 && \
+    CMAKE_URL=https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION} && \
+    CMAKE_SCRIPT=cmake-${CMAKE_VERSION}-linux-x86_64.sh && \
+    wget --quiet ${CMAKE_URL}/${CMAKE_SCRIPT} && \
+    mkdir -p /opt/cmake && \
+    sh ${CMAKE_SCRIPT} --skip-license --prefix=/opt/cmake && \
+    rm cmake*
+ENV PATH=/opt/cmake/bin:$PATH
 
 ###############
 # suitesparse #
