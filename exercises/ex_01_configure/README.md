@@ -208,6 +208,7 @@ To start the configuration process, we will then just execute this script.
 
    Finished configuring Trilinos!
 
+   -- If publishing results using Trilinos, please cite us: https://trilinos.github.io/cite.html
    -- Configuring done
    -- Generating done
    -- Build files have been written to: /opt/trilinos_demo/exercise_configure/trilinos_build
