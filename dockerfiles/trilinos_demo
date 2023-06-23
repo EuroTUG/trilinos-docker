@@ -47,22 +47,21 @@ FROM suitesparse AS trilinos
 ARG TRILINOS_CONFIGFILE=do-configure-trilinos.sh
 ARG TRILINOS_VERSION=14-2-0
 
-WORKDIR /opt/trilinos/
-RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-release-$TRILINOS_VERSION.tar.gz
+WORKDIR /opt/trilinos
+COPY $TRILINOS_CONFIGFILE /opt/trilinos/do-configure-trilinos.sh
+RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-release-$TRILINOS_VERSION.tar.gz && \
+    mkdir source && \
+    tar xfz /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz -C /opt/trilinos/source --strip-components=1 && \
+    rm -f /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz && \
+    mkdir build && pushd build && \
+    ../do-configure-trilinos.sh && popd && \
+    rm do-configure-trilinos.sh && \
+    cmake --build build --parallel 4 && cmake --install build --prefix . && \
+    rm -rf build source
 
-# extract trilinos source file
-RUN mkdir /opt/trilinos/build
-RUN mkdir /opt/trilinos/install
-RUN tar xfz /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz
-RUN mv /opt/trilinos/Trilinos-trilinos-release-$TRILINOS_VERSION /opt/trilinos/source
-RUN rm -f /opt/trilinos/trilinos-release-$TRILINOS_VERSION.tar.gz
-
-# copy configure script to build directory
-COPY $TRILINOS_CONFIGFILE /opt/trilinos/build/do-configure-trilinos.sh
-
-WORKDIR /opt/trilinos/build
-RUN ./do-configure-trilinos.sh
-RUN make -j4 && make install
+# kokkos
+RUN git clone --depth 1 --branch 4.0.01 https://github.com/kokkos/kokkos.git && cmake -S kokkos -B kokkos/build -DKokkos_ENABLE_OPENMP=ON && cmake --build kokkos/build/ --parallel 4 && cmake --install kokkos/build/ --prefix /opt/kokkos && rm -rf kokkos/
+RUN git clone --depth 1 https://github.com/kokkos/kokkos-tutorials.git /opt/kokkos-tutorials
 
 ENV CMAKE_PREFIX_PATH=/opt/trilinos/install:$CMAKE_PREFIX_PATH 
 
