@@ -42,17 +42,6 @@ The Docker container can be built by executing the script
 
 in the main directory of the repository. Running this script will set up a docker image with the flag `trilinos_demo` as described above. Since all the above mentioned software will be installed, **this step will take some time (> 1 hour)**.
 
-In order to **test if the Trilinos installation has been successful**, [run the docker container](#running-the-docker-container) (see below) and run the Trilinos tests using
-
-```shell
-cd /opt/trilinos/build
-ctest -j <numProc>
-```
-
-where `<numProc>` specifies the number of threads to be used for testing in parallel (e.g. 1, 2, ...).
-
-If all tests (approx. 350 tests) are successful, the Docker container is ready to be used.
-
 ### Running and using the Docker container
 
 In order to run the Docker container, just execute the script
