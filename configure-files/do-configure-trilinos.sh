@@ -29,7 +29,8 @@ cmake \
     -D Belos_ENABLE_TESTS:BOOL=ON \
     -D Trilinos_ENABLE_Galeri:BOOL=ON \
       -D Galeri_ENABLE_Xpetra:BOOL=ON \
-    -D Trilinos_ENABLE_Ifpack2:BOOL=ON \
+      -D Trilinos_ENABLE_Ifpack2:BOOL=ON \
+      -D Ifpack2_ENABLE_TESTS:BOOL=OFF \
     -D Trilinos_ENABLE_TESTS:BOOL=ON \
     -D Kokkos_ENABLE_SERIAL:BOOL=ON \
     -D Trilinos_ENABLE_Teuchos:BOOL=ON \

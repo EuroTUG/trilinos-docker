@@ -44,6 +44,7 @@ RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-rel
     ../do-configure-trilinos.sh && popd && \
     rm do-configure-trilinos.sh && \
     cmake --build build --parallel 4 && cmake --install build --prefix . && \
+    ctest  --test-dir build && \
     rm -rf build
 
 # kokkos
