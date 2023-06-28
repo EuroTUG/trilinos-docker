@@ -2,7 +2,7 @@
 
 ### START OF TODO ###
 # Set the mininum cmake version
-cmake_minimum_required(VERSION 3.17.1)
+cmake_minimum_required(VERSION 3.23.0)
 ### END OF TODO ###
 
 ### START OF TODO ###

@@ -54,10 +54,10 @@ where the `<Short instruction>` provides a summary of the steps to be done.
 1. At `### START OF TODO: Set minimum CMake version`, set the minimum required CMake version by adding
 
    ```cmake
-   cmake_minimum_required(VERSION 3.17.1)
+   cmake_minimum_required(VERSION 3.23.0)
    ```
 
-   > _Background:_ Trilinos requires at least CMake version 3.17.
+   > _Background:_ Trilinos requires at least CMake version 3.23.0.
 
 1. At `### START OF TODO: : Declare project ###`, declare the CMake project by adding
 
