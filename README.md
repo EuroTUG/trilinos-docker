@@ -14,7 +14,7 @@ In order to make the material
 + accessible, and
 + portable,
 
-the repository provides **scripts to build a [Docker](https://www.docker.com) container with all required software**. Within the Docker container, it is easy to compile, run, and modify the **exercises and tutorials for Trilinos**.
+the repository provides **scripts to build a [Docker](https://www.docker.com) container with all required software**. Within the Docker container, it is easy to compile, run, and modify the **exercises and tutorials for Trilinos and Kokkos on CPUs**.
 
 **Note:** *Of course, the required software can also be installed directly, such that the examples can be compiled and run without the Docker container.*
 
@@ -26,7 +26,7 @@ Please first install Docker on your computer following the instructions on the [
 
 ---
 
-**All following steps require that the software Docker is running on your computer. Moreover, if Docker complains about permissions, you should execute the scripts with `sudo`**.
+**All following steps require that the software Docker is running on your computer. Moreover, if Docker complains about permissions, [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/)**.
 
 ---
 
@@ -52,9 +52,10 @@ In order to run the Docker container, just execute the script
 
 from the main directory of the repository. The script will **run the container** and **mount the current directory** (should be the main directory of the repository) as the local directory `/opt/trilinos_demo` within the container.
 
-A pre-installed Trilinos is located at `/opt/trilinos/` with its subdirectories `build/`, `install/`, and `source/`.
+A pre-installed Trilinos is located at `/opt/trilinos/` with its subdirectories `build/`, `install/`, and `source/`. The preinstalled Kokkos with OpenMP is located at `/opt/kokkos/`.
 
-For the hands-on exercises, navigate to `/opt/trilinos_demo/exercises/` and follow the instructions in the respective `README.md` files.
+For the hands-on Trilinos exercises, navigate to `/opt/trilinos_demo/exercises/` and follow the instructions in the respective `README.md` files.
+For the hands-on kokkos exercises, navigate to `/opt/kokkos-tutorials/` and follow the instructions in the respective `README.md` files.
 
 To stop the containter, type `exit` in the container's command line.
 
@@ -81,6 +82,11 @@ in the main directory of the repository.
   + [Documentation](https://trilinos.github.io/documentation.html)
   + [Getting started](https://trilinos.github.io/getting_started.html)
   + [Hands-on tutorials](https://github.com/trilinos/Trilinos_tutorial/wiki/TrilinosHandsOnTutorial)
+
++ **Kokkos**
+
+  + [Website](https://kokkos.org/)
+  + [Documentation](https://kokkos.org/kokkos-core-wiki/)
 
 ## Troubleshooting
 
