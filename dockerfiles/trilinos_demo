@@ -48,7 +48,7 @@ RUN wget -nv https://github.com/trilinos/Trilinos/archive/refs/tags/trilinos-rel
     rm -rf build
 
 # kokkos
-RUN git clone --depth 1 --branch 4.0.01 https://github.com/kokkos/kokkos.git && cmake -S kokkos -B kokkos/build -DKokkos_ENABLE_OPENMP=ON && cmake --build kokkos/build/ --parallel 4 && cmake --install kokkos/build/ --prefix /opt/kokkos && rm -rf kokkos/
+RUN git clone --depth 1 --branch 4.3.01 https://github.com/kokkos/kokkos.git && cmake -S kokkos -B kokkos/build -DKokkos_ENABLE_OPENMP=ON && cmake --build kokkos/build/ --parallel 4 && cmake --install kokkos/build/ --prefix /opt/kokkos && rm -rf kokkos/
 RUN git clone --depth 1 https://github.com/kokkos/kokkos-tutorials.git /opt/kokkos-tutorials
 RUN git clone --depth 1 https://github.com/kokkos/kokkos-tools.git && cmake -S kokkos-tools -B kokkos-tools/build && cmake --build kokkos-tools/build --parallel 4 && cmake --install kokkos-tools/build --prefix /opt/kokkos && rm -rf kokkos-tools/
 
