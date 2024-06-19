@@ -17,7 +17,7 @@ ENV PATH=/usr/lib64/mpich/bin/:$PATH
 FROM base AS cmake
 
 # Cmake
-RUN CMAKE_VERSION=3.27.0-rc3 && \
+RUN CMAKE_VERSION=3.29.5 && \
     ARCH="$(uname -m)" && \
     CMAKE_URL=https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION} && \
     CMAKE_SCRIPT=cmake-${CMAKE_VERSION}-linux-${ARCH}.sh && \
