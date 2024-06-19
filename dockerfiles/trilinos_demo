@@ -18,8 +18,9 @@ FROM base AS cmake
 
 # Cmake
 RUN CMAKE_VERSION=3.27.0-rc3 && \
+    ARCH="$(uname -m)" && \
     CMAKE_URL=https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION} && \
-    CMAKE_SCRIPT=cmake-${CMAKE_VERSION}-linux-x86_64.sh && \
+    CMAKE_SCRIPT=cmake-${CMAKE_VERSION}-linux-${ARCH}.sh && \
     wget --quiet ${CMAKE_URL}/${CMAKE_SCRIPT} && \
     mkdir -p /opt/cmake && \
     sh ${CMAKE_SCRIPT} --skip-license --prefix=/opt/cmake && \
