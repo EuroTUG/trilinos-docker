@@ -73,7 +73,7 @@ in the main directory of the repository.
 + **EuroTUG**
 
   + [Website](https://eurotug.github.io)
-  + [Email](mailto:eurotug@tudelft.nl)
+  + [Email](mailto:eurotug@hsu-hh.de)
 
 + **Trilinos**
 
